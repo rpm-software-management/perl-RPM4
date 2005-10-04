@@ -1,0 +1,17 @@
+Index: src/Makefile.PL
+===================================================================
+RCS file: /cooker/soft/perl-Hdlist/src/Makefile.PL,v
+retrieving revision 1.1
+diff -r1.1 Makefile.PL
+5a6,8
+> my $staticrpm = join(' ', map { "$_" } glob ("librpm/*.a"));
+> print "$staticrpm\n";
+> 
+9c12
+<     OBJECT       => 'Hdlist.o Hdlistsign.o',
+---
+>     OBJECT       => 'Hdlist.o Hdlistsign.o $staticrpm',
+12c15
+<     LIBS         => '-lrpm -lrpmio -lrpmdb -lrpmbuild -lpopt -lz -lbz2 -lrpmconstant',
+---
+>     LIBS         => '-lrpm -lpopt -lz -lbz2 -lrpmconstant',

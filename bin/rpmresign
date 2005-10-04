@@ -1,0 +1,65 @@
+#!/usr/bin/perl
+
+##- the Free Software Foundation; either version 2, or (at your option)
+##- any later version.
+##-
+##- This program is distributed in the hope that it will be useful,
+##- but WITHOUT ANY WARRANTY; without even the implied warranty of
+##- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##- GNU General Public License for more details.
+##-
+##- You should have received a copy of the GNU General Public License
+##- along with this program; if not, write to the Free Software
+##- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+# $Id$
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Hdlist::Sign;
+
+my ($configfile, $batch, $sigtype, $passfile, $macrofile, $fastmode, $path, $name, $keyid, $pass);
+my @defines;
+
+GetOptions(
+    'p|path=s' => \$path,
+    'n|name=s' => \$name,
+    'c|config=s' => \$configfile,
+    'b|batch' => \$batch,
+    'd|define=s' => \@defines,
+    'f|fastmode' => \$fastmode,
+    'passwordfile|sig-pass-file=s' => \$passfile,
+    'm|macros=s' => \$macrofile,
+);
+
+foreach (@defines) {
+    Hdlist::add_macro($_);
+}
+
+if (!$passfile) {
+    $pass = <STDIN>;
+    chomp($pass);
+}
+
+my $sign = Hdlist::Sign->new(
+    passphrase => $pass,
+    _signature => $sigtype,
+    path => $path,
+    name => $name,
+    checkrpms => $fastmode ? 0 : 1,
+    password_file => $passfile, 
+);
+
+my @files;
+
+while (my $f = shift(@ARGV)) {
+    -d $f and do {
+        push(@files, glob("$f/*.rpm"));
+        next;
+    };
+    push(@files, $f);
+}
+
+$sign->rpmssign(@files);

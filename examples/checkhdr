@@ -1,0 +1,13 @@
+#!/usr/bin/perl
+
+# $Id$
+
+use strict;
+use warnings;
+use RPM4;
+use RPM4::Header::Checks;
+
+foreach (@ARGV) {
+    my $h = rpm2header($_);
+    RPM4::Header::Checks::check($h);
+}

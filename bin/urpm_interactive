@@ -1,0 +1,149 @@
+#!/usr/bin/perl
+
+##- Nanar <nanardon@mandrake.org>
+##-
+##- This program is free software; you can redistribute it and/or modify
+##- it under the terms of the GNU General Public License as published by
+##- the Free Software Foundation; either version 2, or (at your option)
+##- any later version.
+##-
+##- This program is distributed in the hope that it will be useful,
+##- but WITHOUT ANY WARRANTY; without even the implied warranty of
+##- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##- GNU General Public License for more details.
+##-
+##- You should have received a copy of the GNU General Public License
+##- along with this program; if not, write to the Free Software
+##- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+# $Id$
+
+use strict;
+use warnings;
+
+use Hdlist::Media;
+use Hdlist::Media::Solve;
+use Term::ReadLine;
+use Text::ParseWords;
+use urpm;
+use Getopt::Long;
+
+#Hdlist::setverbosity('DEBUG');
+
+my $dbpath;
+
+GetOptions(
+    "dbpath=s" => \$dbpath,
+);
+
+
+Hdlist::add_macro("_dbpath $dbpath") if ($dbpath);
+
+my $s = Hdlist::Media::Solve->new(
+);
+
+{
+    my $u = urpm->new();
+    $u->read_config;
+    foreach my $m (@{$u->{media}}) {
+       $m->{virtual} or next;
+       my $dir = $m->{url};
+       $dir =~ s!file:/+!/!;
+       $s->addmedia(
+           Hdlist::Media->new(
+               hdlist => $m->{with_hdlist},
+               rpmsdir => $dir,
+           ),
+       );
+    }
+}
+
+$s->add_system_dep('REQUIRE', "basesystem");
+
+$s->load();
+
+my $term = new Term::ReadLine 'Hdlist';
+
+my $prompt = "urpm > ";
+
+while (defined (my $cmdline = $term->readline($prompt))) {
+    chomp($cmdline);
+    my $cmd; local @ARGV;
+    ($cmd, @ARGV) = &parse_line('\s+', 0, $cmdline);
+   
+    $cmd or next;
+    $term->addhistory($cmdline);
+
+    $cmd =~ /^quit$/ and last;
+    
+    $cmd =~ /^(q|query)$/ and do {
+        my $tag;
+        my $qf;
+        GetOptions(
+            "t|tag=s" => \$tag,
+            "qf|queryformat=s" => \$qf,
+        );
+        $s->traverse(db => 1, medium => undef, callback => sub {
+            my ($header, $id, $media) = @_;
+            print "$media: " . $header->queryformat($qf || $s->{short_fmt}) ."\n";
+            1;
+        }, tag => $tag || ($ARGV[0] ? 'NAME' : ""), tagvalue => $ARGV[0]);
+        next;
+    };
+    
+    $cmd =~ /^sysdep$/ and do {
+        my $tag = 'REQUIRE';
+        GetOptions(
+            'c' => sub { $tag = 'CONFLICT'; },
+        );
+        $ARGV[0] or next;
+        $s->add_system_dep($tag, @ARGV);
+        next;
+    };
+    
+    $cmd =~ /^(\+|add)$/ and do {
+        $s->find_and_add($ARGV[0]);
+        next;
+    };
+
+    $cmd =~ /^(-|remove)$/ and do {
+        $s->find_and_remove($ARGV[0]);
+        next;
+    };
+
+    $cmd =~ /^a(utoselect)?$/ and do {
+        $s->autoselect();
+        next;
+    };
+
+    $cmd =~ /^c(heck)?$/ and do {
+        $s->check();
+        next;
+    };
+
+    $cmd =~ /^r(un)?$/ and do {
+        $s->run();
+        next;
+    };
+
+    $cmd =~ /^l(ist)?$/ and do {
+        $s->list_trans();
+        next;
+    };
+
+    $cmd =~ /^d$/ and do {
+        $s->add_from_require(@ARGV);
+        next;
+    };
+    
+    $cmd =~ /^clean$/ and do {
+        foreach (@ARGV) {
+            m/trans/ and $s->clean_trans();
+            m/request/ and $s->clean_request();
+        }
+        next;
+    };
+    
+    print "unknow command '$cmd'\n";
+};
+
