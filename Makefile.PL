@@ -17,7 +17,7 @@ sub MY::postamble {
 .PHONY: ChangeLog
 
 ChangeLog:
-	svn update && svn log --verbose > \$@
+	LC_ALL=C svn update && LC_ALL=C svn log --verbose > \$@
 
 rpm: dist
 	rpm --rmsource --define "_sourcedir `pwd`" -ba perl-Hdlist.spec
