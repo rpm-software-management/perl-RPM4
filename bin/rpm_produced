@@ -39,13 +39,13 @@ Options:
   --no-src                   do not show the src.rpm
 ";
 
-Hdlist::add_macro("_sourcedir $tmp");
-Hdlist::add_macro("_specdir $tmp");
+RPM4::add_macro("_sourcedir $tmp");
+RPM4::add_macro("_specdir $tmp");
 
 sub set_config {
-    Hdlist::readconfig();
+    RPM4::readconfig();
     foreach (@macros) {
-        Hdlist::add_macro($_);
+        RPM4::add_macro($_);
     }
 }
 
@@ -60,8 +60,8 @@ sub specquery {
 foreach my $file (@ARGV) {
     set_config();
     $file =~ m/\.src\.rpm$/ and do {
-        if(my ($specfile) = Hdlist::installsrpm($file)) {
-            if (my $spec = Hdlist::specnew($specfile, undef, undef, undef, 1, 1)) {
+        if(my ($specfile) = RPM4::installsrpm($file)) {
+            if (my $spec = RPM4::specnew($specfile, undef, undef, undef, 1, 1)) {
                 specquery($spec);
                 $spec->build([qw(RMSOURCE RMSPEC)]);
             }
@@ -69,7 +69,7 @@ foreach my $file (@ARGV) {
         next;
     };
     $file =~ m/\.spec$/ and do {
-        if (my $spec = Hdlist::specnew($file, undef, undef, undef, 1, 1)) {
+        if (my $spec = RPM4::specnew($file, undef, undef, undef, 1, 1)) {
             specquery($spec);
         }
         next;

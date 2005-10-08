@@ -21,14 +21,14 @@
 use strict;
 use warnings;
 
-use Hdlist::Media;
-use Hdlist::Media::Solve;
+use RPM4::Media;
+use RPM4::Media::Solve;
 use Term::ReadLine;
 use Text::ParseWords;
 use urpm;
 use Getopt::Long;
 
-#Hdlist::setverbosity('DEBUG');
+#RPM4::setverbosity('DEBUG');
 
 my $dbpath;
 
@@ -37,9 +37,9 @@ GetOptions(
 );
 
 
-Hdlist::add_macro("_dbpath $dbpath") if ($dbpath);
+RPM4::add_macro("_dbpath $dbpath") if ($dbpath);
 
-my $s = Hdlist::Media::Solve->new(
+my $s = RPM4::Media::Solve->new(
 );
 
 {
@@ -50,7 +50,7 @@ my $s = Hdlist::Media::Solve->new(
        my $dir = $m->{url};
        $dir =~ s!file:/+!/!;
        $s->addmedia(
-           Hdlist::Media->new(
+           RPM4::Media->new(
                hdlist => $m->{with_hdlist},
                rpmsdir => $dir,
            ),
@@ -62,7 +62,7 @@ $s->add_system_dep('REQUIRE', "basesystem");
 
 $s->load();
 
-my $term = new Term::ReadLine 'Hdlist';
+my $term = new Term::ReadLine 'RPM4';
 
 my $prompt = "urpm > ";
 

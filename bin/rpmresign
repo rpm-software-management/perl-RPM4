@@ -18,7 +18,7 @@ use strict;
 use warnings;
 
 use Getopt::Long;
-use Hdlist::Sign;
+use RPM4::Sign;
 
 my ($configfile, $batch, $sigtype, $passfile, $macrofile, $fastmode, $path, $name, $keyid, $pass);
 my @defines;
@@ -35,7 +35,7 @@ GetOptions(
 );
 
 foreach (@defines) {
-    Hdlist::add_macro($_);
+    RPM4::add_macro($_);
 }
 
 if (!$passfile) {
@@ -43,7 +43,7 @@ if (!$passfile) {
     chomp($pass);
 }
 
-my $sign = Hdlist::Sign->new(
+my $sign = RPM4::Sign->new(
     passphrase => $pass,
     _signature => $sigtype,
     path => $path,

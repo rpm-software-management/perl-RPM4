@@ -69,7 +69,7 @@ hrpmreb
 
 =head1 DESCRIPTION
 
-A very powerful rpm rebuilder using perl-Hdlist
+A very powerful rpm rebuilder using perl-RPM4
 
 =head1 SYNOPSYS
 
@@ -231,12 +231,12 @@ to use hrpmreb --stat to immediatelly get status of the current build.
 
 =cut
 
-require Hdlist;
-Hdlist::setverbosity($verbose || "INFO");
+require RPM4;
+RPM4::setverbosity($verbose || "INFO");
 
 my $hlog = undef;
 
-Hdlist::setlogcallback(
+RPM4::setlogcallback(
     sub {
         my %arg = @_;
         loging("%s", $arg{msg});
@@ -253,7 +253,7 @@ sub loging {
 
 config_macros();
 
-if (Hdlist::expandnumeric("%livestat")) {
+if (RPM4::expandnumeric("%livestat")) {
     require IPC::ShareLite;
     foreach my $k (1000 .. 1020) {
         $ipcstat = new IPC::ShareLite (
@@ -275,34 +275,34 @@ my %status = (
     currentstep => '',
 );
     
-my $passphrase = Hdlist::expand('%{?gpgpass}');
+my $passphrase = RPM4::expand('%{?gpgpass}');
 
-my @srcdir = split(':', Hdlist::expand('%{?srcdir}'));
-print Hdlist::expand("Source dir: %{?srcdir}%{?!srcdir:(none)}\n") if ($batch);
+my @srcdir = split(':', RPM4::expand('%{?srcdir}'));
+print RPM4::expand("Source dir: %{?srcdir}%{?!srcdir:(none)}\n") if ($batch);
 
 !@srcdir && $batch and die "No src dir, please define \%srcdir\n";
 
-my @bindir = split(':', Hdlist::expand('%{?bindir}'));
-if (Hdlist::expandnumeric('%checkbinary')) {
+my @bindir = split(':', RPM4::expand('%{?bindir}'));
+if (RPM4::expandnumeric('%checkbinary')) {
     if (@bindir) {
-        print Hdlist::expand("Using binary dir: %{?bindir}%{?!bindir:(none)}\n");
+        print RPM4::expand("Using binary dir: %{?bindir}%{?!bindir:(none)}\n");
     } else {
         die "No bin dir, please define \%bindir or unset \%checkbinary\n";
     }
 }
 
 if ($dumpconfig) {
-    Hdlist::dumprc(\*STDOUT);
+    RPM4::dumprc(\*STDOUT);
     exit 0;
 }
 
--d Hdlist::expand("%{?logdir}%{!?logdir:.}") or mkdir Hdlist::expand("%{?logdir}%{!?logdir:.}")
-    or die "Can't create logdir ". Hdlist::expand("%{?logdir}%{!?logdir:.}") . " $!\n";
+-d RPM4::expand("%{?logdir}%{!?logdir:.}") or mkdir RPM4::expand("%{?logdir}%{!?logdir:.}")
+    or die "Can't create logdir ". RPM4::expand("%{?logdir}%{!?logdir:.}") . " $!\n";
 
-if (Hdlist::expandnumeric('%createrpmsdir')) {
+if (RPM4::expandnumeric('%createrpmsdir')) {
     foreach my $macro (qw(%_topdir %_sourcedir %_builddir %_srpmdir %_rpmdir %_rpmdir/noarch %_rpmdir/%_target_cpu %_specdir %_tmppath)) {
-        -d Hdlist::expand($macro) or mkdir Hdlist::expand($macro)
-	    or die "Can't create dir " .  Hdlist::expand($macro) . "($macro): $!";
+        -d RPM4::expand($macro) or mkdir RPM4::expand($macro)
+	    or die "Can't create dir " .  RPM4::expand($macro) . "($macro): $!";
     }
 }
 
@@ -333,7 +333,7 @@ if (! $status{srpmtotal}) {
     die sprintf("Nothing to do, %s\n", $batch ? "check \%srcdir value" : "give src.rpm too rebuild or use -b");
 }
 
-if (Hdlist::expandnumeric("%sortbybuilddate")) {
+if (RPM4::expandnumeric("%sortbybuilddate")) {
     loging("Sorting srpms by buildate\n");
     set_ipc_status(currentstep => "sorting srpms");
     @srpmstobuild = sort_srpms(@srpmstobuild);
@@ -353,8 +353,8 @@ foreach my $specfile (@specstobuild) {
         
         config_macros();
     } else {
-        my $oldcmd = Hdlist::expand("%___build_cmd");
-        Hdlist::add_macro("___build_cmd %myself --trap %_tmppath/%name-%version-%release.build.log $oldcmd");
+        my $oldcmd = RPM4::expand("%___build_cmd");
+        RPM4::add_macro("___build_cmd %myself --trap %_tmppath/%name-%version-%release.build.log $oldcmd");
         exit(build_specfile($specfile));
     }    
 }
@@ -370,8 +370,8 @@ foreach my $srpm (@srpmstobuild) {
         
         config_macros();
     } else {
-        my $oldcmd = Hdlist::expand("%___build_cmd");
-        Hdlist::add_macro("___build_cmd %myself --trap %_tmppath/%name-%version-%release.build.log $oldcmd");
+        my $oldcmd = RPM4::expand("%___build_cmd");
+        RPM4::add_macro("___build_cmd %myself --trap %_tmppath/%name-%version-%release.build.log $oldcmd");
         exit(build_srcrpm($srpm));
     }    
 }
@@ -425,7 +425,7 @@ sub set_ipc_status {
 
 sub sort_srpms {
     my %s;
-    my $db = Hdlist::newdb();
+    my $db = RPM4::newdb();
     $db->vsflags([ qw(NOSIGNATURES NOPAYLOAD NODIGESTS) ]);
     my $done = 0;
     my @specs;
@@ -440,21 +440,21 @@ sub sort_srpms {
 }
 
 sub config_macros {
-    Hdlist::resetmacros();
+    RPM4::resetmacros();
 
-    Hdlist::add_macro("logfileformat %name.log");
+    RPM4::add_macro("logfileformat %name.log");
     
-    Hdlist::readconfig();
+    RPM4::readconfig();
     
-    Hdlist::loadmacrosfile($_) foreach (@macros); 
-    Hdlist::add_macro($_) foreach(@define);
+    RPM4::loadmacrosfile($_) foreach (@macros); 
+    RPM4::add_macro($_) foreach(@define);
 
-    Hdlist::add_macro("myself $0");
+    RPM4::add_macro("myself $0");
 }
 
 sub checkbinary {
     my ($spec) = @_;
-    Hdlist::expandnumeric('%checkbinary') or return 1;
+    RPM4::expandnumeric('%checkbinary') or return 1;
     my $missing = 0;
     my @bin = $spec->binrpm();
     foreach my $r (@bin) {
@@ -479,19 +479,19 @@ sub checkbinary {
         }
     }
     return 0 if ($missing == 0);
-    return Hdlist::expandnumeric('%checkbinary') <= ($missing == scalar(@bin) ? 2 : 1);
+    return RPM4::expandnumeric('%checkbinary') <= ($missing == scalar(@bin) ? 2 : 1);
 }
 
 sub build_srcrpm {
     my ($srpm) = @_;
-    my ($specf, $cookies) = Hdlist::installsrpm($srpm) or return 1;
+    my ($specf, $cookies) = RPM4::installsrpm($srpm) or return 1;
     my $rc = 0;
     
     my $spec;
-    if ($spec = Hdlist::specnew($specf, $passphrase, "/", $cookies, 0, 0)) {
-        open($hlog, ">", Hdlist::expand('%{?logdir:%{logdir}/}%{logfileformat}'));
-        $0 = Hdlist::expand("hrpmreb [%name-%version-%release]");
-        set_ipc_status(currentsrpms => Hdlist::expand("%name-%version-%release"));
+    if ($spec = RPM4::specnew($specf, $passphrase, "/", $cookies, 0, 0)) {
+        open($hlog, ">", RPM4::expand('%{?logdir:%{logdir}/}%{logfileformat}'));
+        $0 = RPM4::expand("hrpmreb [%name-%version-%release]");
+        set_ipc_status(currentsrpms => RPM4::expand("%name-%version-%release"));
         $SIG{'TERM'} = sub {
             $spec && $spec->build(["RMSOURCE", "RMSPEC", "RMBUILD"]);
             $spec && $spec->build(["CLEAN"]);
@@ -504,15 +504,15 @@ sub build_srcrpm {
             loging("Found binary, skipping build\n");
         }
 
-        if ($rc || Hdlist::expandnumeric('%keepalllog')) {
-            if (open(my $buildlog, "<", Hdlist::expand("%_tmppath/%name-%version-%release.build.log"))) {
+        if ($rc || RPM4::expandnumeric('%keepalllog')) {
+            if (open(my $buildlog, "<", RPM4::expand("%_tmppath/%name-%version-%release.build.log"))) {
                 while (<$buildlog>) {
                     print $hlog $_;
                 }
                 close($buildlog);
             }
         } else {
-            unlink(Hdlist::expand("\%{?logdir:%{logdir}/}%{logfileformat}"));
+            unlink(RPM4::expand("\%{?logdir:%{logdir}/}%{logfileformat}"));
         }
         
         close($hlog); $hlog = undef;
@@ -520,7 +520,7 @@ sub build_srcrpm {
         $rc = 1;
     }
 
-    $spec ||= Hdlist::specnew($specf, $passphrase, "/", $cookies, 1, 1);
+    $spec ||= RPM4::specnew($specf, $passphrase, "/", $cookies, 1, 1);
 
     if ($spec) {
         set_ipc_status(currentstep => "cleaning");
@@ -528,7 +528,7 @@ sub build_srcrpm {
         $spec && $spec->build(["RMSOURCE", "RMSPEC", "RMBUILD"]);
     }
 
-    unlink(Hdlist::expand("%_tmppath/%name-%version-%release.build.log"));
+    unlink(RPM4::expand("%_tmppath/%name-%version-%release.build.log"));
     return $rc;
 }
 
@@ -537,10 +537,10 @@ sub build_specfile {
     my $rc = 0;
     
     my $spec;
-    if ($spec = Hdlist::specnew($specf, $passphrase, "/", undef, 0, 0)) {
-        open($hlog, ">", Hdlist::expand('%{?logdir:%{logdir}/}%{logfileformat}'));
-        $0 = Hdlist::expand("hrpmreb [%name-%version-%release]");
-        set_ipc_status(currentsrpms => Hdlist::expand("%name-%version-%release"));
+    if ($spec = RPM4::specnew($specf, $passphrase, "/", undef, 0, 0)) {
+        open($hlog, ">", RPM4::expand('%{?logdir:%{logdir}/}%{logfileformat}'));
+        $0 = RPM4::expand("hrpmreb [%name-%version-%release]");
+        set_ipc_status(currentsrpms => RPM4::expand("%name-%version-%release"));
         $SIG{'TERM'} = sub {
             $spec && $spec->build(["RMBUILD"]);
         };
@@ -555,15 +555,15 @@ sub build_specfile {
             loging("Found binary, skipping build\n");
         }
 
-        if ($rc || Hdlist::expandnumeric('%keepalllog')) {
-            if (open(my $buildlog, "<", Hdlist::expand("%_tmppath/%name-%version-%release.build.log"))) {
+        if ($rc || RPM4::expandnumeric('%keepalllog')) {
+            if (open(my $buildlog, "<", RPM4::expand("%_tmppath/%name-%version-%release.build.log"))) {
                 while (<$buildlog>) {
                     print $hlog $_;
                 }
                 close($buildlog);
             }
         } else {
-            unlink(Hdlist::expand("\%{?logdir:%{logdir}/}%{logfileformat}"));
+            unlink(RPM4::expand("\%{?logdir:%{logdir}/}%{logfileformat}"));
         }
         
         close($hlog); $hlog = undef;
@@ -571,7 +571,7 @@ sub build_specfile {
         $rc = 1;
     }
 
-    $spec ||= Hdlist::specnew($specf, $passphrase, "/", undef, 1, 1);
+    $spec ||= RPM4::specnew($specf, $passphrase, "/", undef, 1, 1);
 
     if ($spec) {
         set_ipc_status(currentstep => "cleaning");
@@ -579,7 +579,7 @@ sub build_specfile {
         $spec && $spec->build(["RMBUILD"]);
     }
 
-    unlink(Hdlist::expand("%_tmppath/%name-%version-%release.build.log"));
+    unlink(RPM4::expand("%_tmppath/%name-%version-%release.build.log"));
     return $rc;
 }
 
@@ -590,17 +590,17 @@ sub build_spec {
 
     $starttime = time;
     
-    if (Hdlist::expandnumeric('%installdep') && $srpm) {
+    if (RPM4::expandnumeric('%installdep') && $srpm) {
         set_ipc_status(currentstep => "installing dep");
         runmacro("%installdepcmd", $srpm);
         $installdeptime = time;
     }
     
-    nice(Hdlist::expand("%{?nice}")) if (Hdlist::expandnumeric("%{?nice:1}"));
+    nice(RPM4::expand("%{?nice}")) if (RPM4::expandnumeric("%{?nice:1}"));
     set_ipc_status(currentstep => "checking dep");
     my @pb;
     {
-    my $db = Hdlist::newdb();
+    my $db = RPM4::newdb();
     my $sh = $spec->srcheader();
 
     $db->transadd($sh, "", 0);
@@ -611,7 +611,7 @@ sub build_spec {
     
     if (@pb) {
         loging("\nMissing dependancies:\n");
-        loging("$_\n") foreach(Hdlist::format_rpmpb(@pb));
+        loging("$_\n") foreach(RPM4::format_rpmpb(@pb));
         $rc = 1;
     } elsif(! $nobuild) {
         set_ipc_status(currentstep => "compiling");
@@ -647,7 +647,7 @@ sub upload_build {
         }
     }
     $noexist and return 1;
-    if (Hdlist::expandnumeric('%upload')) {
+    if (RPM4::expandnumeric('%upload')) {
         set_ipc_status(currentstep => "uploading");
         !runmacro("%uploadcmd", @buildrpms) and unlink @buildrpms;
     }
@@ -656,7 +656,7 @@ sub upload_build {
 
 sub runmacro {
     my ($macro, @args) = @_;
-    my $cmd = Hdlist::expand($macro. " " . join(' ', @args));
+    my $cmd = RPM4::expand($macro. " " . join(' ', @args));
     $cmd =~ /^\Q$macro/ and return 1;
     loging("Executing(%%%s) %s\n", $macro, $cmd);
     system($cmd)
