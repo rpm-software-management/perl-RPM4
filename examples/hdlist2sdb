@@ -19,7 +19,7 @@
 # $Id$
 
 use strict;
-use Hdlist;
+use RPM4;
 use Getopt::Long;
 
 GetOptions (
@@ -31,11 +31,11 @@ Synch rpm found into given hdlist into a database.
 Usefull to create a solve rpm database.
 ";
 
-$dbpath ||= Hdlist::expand("%_solve_dbpath");
+$dbpath ||= RPM4::expand("%_solve_dbpath");
 
-Hdlist::add_macro("_dbpath $dbpath");
+RPM4::add_macro("_dbpath $dbpath");
 
-my $db = Hdlist::newdb(1) or die "Can't open DB";
+my $db = RPM4::newdb(1) or die "Can't open DB";
 
 my %rpmlist;
 my %indb;

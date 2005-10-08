@@ -19,7 +19,7 @@
 # $Id$
 
 use strict;
-use Hdlist;
+use RPM4;
 use Getopt::Long qw(:config pass_through);
 
 sub help {
@@ -72,7 +72,7 @@ GetOptions(
 (@rpmi || @rpme) or help();
 
 if (defined($dbpath)) {
-    Hdlist::add_macro("_dbpath $dbpath");
+    RPM4::add_macro("_dbpath $dbpath");
 }
 my $db = newdb(0, $root);
 

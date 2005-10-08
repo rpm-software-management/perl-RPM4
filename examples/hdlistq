@@ -19,7 +19,7 @@
 # $Id$
 
 use strict;
-use Hdlist;
+use RPM4;
 use Getopt::Long;
 
 my $qf = "%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}\n";
@@ -45,7 +45,7 @@ Description :\n%{DESCRIPTION}
 my ($type, $name, $flag, $ENV, $dep);
 if ($cond) {
     my @d = split(/ +/, $cond);
-    $dep = Hdlist::newdep(@d);
+    $dep = RPM4::newdep(@d);
 }
 
 ($go_res && @ARGV) or die 

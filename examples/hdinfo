@@ -19,13 +19,13 @@
 # $Id$
 
 use strict;
-use Hdlist;
+use RPM4;
 
-my $arch = Hdlist::getarchname();
+my $arch = RPM4::getarchname();
 print "arch = " . $arch . "\n";
 
-my $os = Hdlist::getosname();
+my $os = RPM4::getosname();
 print "os = " . $os . "\n";
 
-my $host = Hdlist::buildhost();
+my $host = RPM4::buildhost();
 print "host = " . $host . "\n";

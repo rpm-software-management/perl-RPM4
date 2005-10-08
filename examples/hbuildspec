@@ -19,7 +19,7 @@
 # $Id$
 
 use strict;
-use Hdlist;
+use RPM4;
 use Getopt::Long;
 
 (@ARGV) or die 
@@ -28,10 +28,10 @@ Give rpms filename produce by a specfile
 ";
 
 foreach (@ARGV) {
-    my $spec = Hdlist::specnew($_);
+    my $spec = RPM4::specnew($_);
     my @err = $spec->check();
     if (@err) {
-        foreach (Hdlist::print_rpmpb(@err)) {
+        foreach (RPM4::print_rpmpb(@err)) {
             print "\t$_\n";
         }
     } else {

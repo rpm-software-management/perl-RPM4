@@ -19,7 +19,7 @@
 # $Id$
 
 use strict;
-use Hdlist;
+use RPM4;
 
 (@ARGV) or die("$0 <rpmfilename>");
 
@@ -28,7 +28,7 @@ foreach (@ARGV) {
   if($header) {	
     print "tag\tnom\t\texiste\tvaleur\n";
     foreach ($header->listtag) { 
-      print "$_\t" . Hdlist::tagName($_) .  "\t\t";
+      print "$_\t" . RPM4::tagName($_) .  "\t\t";
       my $e;
       $e = $header->hastag("$_");
       print "$e\t";
