@@ -263,69 +263,69 @@ if $item is omitted, returns an empty object.
 
 If data are unreadable for whatever reason, returns undef.
 
-=head2 RPM4::Header->write(*FILE)
+=head2 write(*FILE)
 
 Dump header data into file handle.
 
 Warning: Perl modifier (like PerlIO::Gzip) won't works.
 
-=head2 RPM4::Header->hsize()
+=head2 hsize()
 
 Returns the on-disk size of header data, in bytes.
 
-=head2 RPM4::Header->copy()
+=head2 copy()
 
 Returns a RPM4::Header object copy.
 
-=head2 RPM4::Header->removetag(tagid)
+=head2 removetag(tagid)
 
 Remove tag 'tagid' from header.
 
-=head2 RPM4::Header->addtag(tagid, tagtype, value1, value2...)
+=head2 addtag(tagid, tagtype, value1, value2...)
 
 Add a tag into the header:
 - tagid is the integervalue of tag
 - tagtype is an integer, it identify the tag type to add (see rpmlib headers 
 files). Other argument are value to put in tag.
 
-=head2 RPM4::Header->listtag()
+=head2 listtag()
 
 Returns a list of tag id present in header.
 
-=head2 RPM4::Header->hastag(tagid)
+=head2 hastag(tagid)
 
 Returns true if tag 'tagid' is present in header.
 
 Ex:
     $header->hastag(1000); # Returns true if tag 'NAME' is present.
 
-=head2 RPM4::Header->tagtype(tagid)
+=head2 tagtype(tagid)
 
 Returns the tagtype value of tagid. Returns 0 if tagid is not found.
 
-=head2 RPM4::Header->tag(tagid)
+=head2 tag(tagid)
 
 Returns array of tag value for tag 'tagid'.
 
     $header->tag(1000); # return the name of rpm header.
 
-=head2 RPM4::Header->queryformat($query)
+=head2 queryformat($query)
 
 Make a formated query on the header, macros in I<$query> are evaluated.
 This function works like C<rpm --queryformat ...>
 
     $header->queryformat("%{NAME}-%{VERSION}-%{RELEASE}");
 
-=head2 RPM4::Header->fullname
+=head2 fullname
 
 In scalar context return the "name-version-version.arch" of package.
 In array context return (name, version, release, arch) of package.
 
-=head2 RPM4::Header->issrc()
+=head2 issrc()
 
 Returns true if package is a source package.
 
-=head2 RPM4::Header->compare(header)
+=head2 compare(header)
 
 Compare the header to another, return 1 if the object is higher, -1 if
 header passed as argument is better, 0 if update is not possible.
