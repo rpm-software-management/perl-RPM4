@@ -30,7 +30,7 @@ use RPM4::Header::Dependencies;
 use RPM4::Header::Files;
 use RPM4::Spec;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our @ISA = qw(DynaLoader Exporter);
 our @EXPORT = qw(moduleinfo
                  readconfig querytag tagName tagValue expand rpmvercmp
@@ -190,7 +190,7 @@ __END__
 
 =head1 NAME
 
-RPM4 - perl module to handle hdlist and synthesis files
+RPM4 - perl module to access and manipulate RPM files
 
 =head1 SYNOPSIS
 
