@@ -67,7 +67,7 @@ Hdlist::Header::Changelogs - A set of changelogs
 =head1 SYNOPSIS
 
     use RPM4::Header;
-    
+
     my $header RPM4::Header->new("foo.rpm");
     my $changelog = RPM4::Header::Changelog->new($header);
     $changelog->init; # not need here

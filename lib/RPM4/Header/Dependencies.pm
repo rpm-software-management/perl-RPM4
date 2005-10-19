@@ -66,7 +66,7 @@ Move internal index to $index (0 by default).
 
 =head2 $deps->init
 
-Reset internal index and set it to -1, see L<$deps-\\>next()>
+Reset internal index and set it to -1, see L<next>
 
 =head2 $deps->hasnext
 
