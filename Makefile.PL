@@ -29,8 +29,4 @@ WriteMakefile(
     VERSION_FROM => 'lib/RPM4.pm',
     DIR          => [ 'src' ],
     'EXE_FILES'  => [ qw(bin/rpm_produced bin/rpmresign bin/hrpmreb) ],
-    dist => {
-        COMPRESS => 'bzip2 --best',
-        SUFFIX => '.bz2',
-    }, 
 );
