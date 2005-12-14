@@ -2054,13 +2054,16 @@ void
 rpmlibdep()
     PREINIT:
     rpmds Dep = NULL;
+#ifndef RPM4_4_3
     rpmds next;
     const char ** provNames;
     int * provFlags;
     const char ** provVersions;
     int num = 0;
     int i;
+#endif
     PPCODE:
+#ifndef RPM4_4_3
     num = rpmGetRpmlibProvides(&provNames, &provFlags, &provVersions);
     for (i = 0; i < num; i++) {
 #ifdef HDLISTDEBUG
@@ -2079,6 +2082,10 @@ rpmlibdep()
 #endif
         }
     }
+#else
+    if (!rpmdsRpmlib(&Dep, NULL))
+        XPUSHs(sv_2mortal(sv_setref_pv(newSVpv("", 0), bless_rpmds, Dep)));
+#endif
 
 MODULE = RPM4 	PACKAGE = RPM4::Header::Dependencies  PREFIX = Dep_
 
