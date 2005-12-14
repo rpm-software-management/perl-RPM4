@@ -3,6 +3,7 @@
 #ifndef _HDLIST_H
 #define _HDLIST_H
 
+#include "rpmversion.h"
 #include "header.h"
 
 /* Hdlistsign.c: imported but modified functions */
