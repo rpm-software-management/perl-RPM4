@@ -598,20 +598,23 @@ sub build_spec {
     
     nice(RPM4::expand("%{?nice}")) if (RPM4::expandnumeric("%{?nice:1}"));
     set_ipc_status(currentstep => "checking dep");
-    my @pb;
+    my $pbs;
     {
     my $db = RPM4::newdb();
     my $sh = $spec->srcheader();
 
     $db->transadd($sh, "", 0);
     $db->transcheck;
-    @pb = $db->transpb();
+    $pbs = $db->transpbs();
     }
     $chkdeptime = time;
     
-    if (@pb) {
+    if ($pbs) {
+        $pbs->init;
         loging("\nMissing dependancies:\n");
-        loging("$_\n") foreach(RPM4::format_rpmpb(@pb));
+        while($pbs->hasnext) {
+            loging($pbs->problem() . "\n");
+        }
         $rc = 1;
     } elsif(! $nobuild) {
         set_ipc_status(currentstep => "compiling");
