@@ -2111,7 +2111,7 @@ rpmlibgetconf(path = NULL)
 #endif
     PPCODE:
 #ifdef RPM4_4_3
-    if(!rpmdsSysinfo(&Dep, path)) {
+    if(!rpmdsGetconf(&Dep, path)) {
         XPUSHs(sv_2mortal(sv_setref_pv(newSVpv("", 0), bless_rpmds, Dep)));
     }
 #else
