@@ -2091,7 +2091,7 @@ rpmlibdep()
 #endif
 
 void
-rpmlibsysinfo(sysinfofile = NULL)
+rpmsysinfodep(sysinfofile = NULL)
     char * sysinfofile
     PREINIT:
 #ifdef RPM4_4_3
@@ -2106,7 +2106,7 @@ rpmlibsysinfo(sysinfofile = NULL)
 #endif
 
 void
-rpmlibgetconf(path = NULL)
+rpmgetconfdep(path = NULL)
     char * path
     PREINIT:
 #ifdef RPM4_4_3
@@ -2121,7 +2121,7 @@ rpmlibgetconf(path = NULL)
 #endif
 
 void
-rpmcpuinfo(path = NULL)
+rpmcpuinfodep(path = NULL)
     char * path
     PREINIT:
 #ifdef RPM4_4_3
@@ -2135,7 +2135,36 @@ rpmcpuinfo(path = NULL)
 #else
 #endif
 
+void
+rpmunamedep()
+    PREINIT:
+#ifdef RPM4_4_3
+    rpmds Dep = NULL;
+#endif
+    PPCODE:
+#ifdef RPM4_4_3
+    if(!rpmdsUname(&Dep, NULL)) {
+        XPUSHs(sv_2mortal(sv_setref_pv(newSVpv("", 0), bless_rpmds, Dep)));
+    }
+#else
+#endif
 
+void
+rpmpipedep(cmd, tag = 0)
+    char * cmd
+    int tag
+    PREINIT:
+#ifdef RPM4_4_3
+    rpmds Dep = NULL;
+#endif
+    PPCODE:
+#ifdef RPM4_4_3
+    if(!rpmdsPipe(&Dep, tag, cmd)) {
+        XPUSHs(sv_2mortal(sv_setref_pv(newSVpv("", 0), bless_rpmds, Dep)));
+    }
+#else
+#endif
+    
 MODULE = RPM4 	PACKAGE = RPM4::Header::Dependencies  PREFIX = Dep_
 
 void
