@@ -524,13 +524,16 @@ moduleinfo()
 #else
     XPUSHs(sv_2mortal(newSVpv("No", 0)));
 #endif
-    XPUSHs(sv_2mortal(newSVpv("RPMVERSION", 0)));
+    
     XPUSHs(sv_2mortal(newSVpv("RPMVERSION", 0)));
     XPUSHs(sv_2mortal(newSVpv(RPMVERSION, 0)));
+    
     XPUSHs(sv_2mortal(newSVpv("RPM4VERSION", 0)));
     XPUSHs(sv_2mortal(newSVpv(VERSION, 0)));
+    
     XPUSHs(sv_2mortal(newSVpv("RPMNAME", 0)));
     XPUSHs(sv_2mortal(newSVpv(rpmNAME, 0)));
+    
     XPUSHs(sv_2mortal(newSVpv("RPMEVR", 0)));
     XPUSHs(sv_2mortal(newSVpv(rpmEVR, 0)));
 
