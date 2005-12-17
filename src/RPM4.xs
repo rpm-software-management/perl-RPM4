@@ -2116,7 +2116,23 @@ rpmlibgetconf(path = NULL)
     }
 #else
 #endif
-    
+
+void
+rpmcpuinfo(path = NULL)
+    char * path
+    PREINIT:
+#ifdef RPM4_4_3
+    rpmds Dep = NULL;
+#endif
+    PPCODE:
+#ifdef RPM4_4_3
+    if(!rpmdsCpuinfo(&Dep, path)) {
+        XPUSHs(sv_2mortal(sv_setref_pv(newSVpv("", 0), bless_rpmds, Dep)));
+    }
+#else
+#endif
+
+
 MODULE = RPM4 	PACKAGE = RPM4::Header::Dependencies  PREFIX = Dep_
 
 void
