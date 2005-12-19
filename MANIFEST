@@ -21,6 +21,7 @@ lib/RPM4/Transaction.pm
 lib/RPM4/Transaction/Problems.pm
 lib/RPM4/Spec.pm
 lib/RPM4/Media.pm
+lib/RPM4/Sign.pm
 t/test-rpm-1.0-1mdk.noarch.rpm
 t/test-rpm-1.0-1mdk.src.rpm
 t/test-rpm.spec
