@@ -32,6 +32,13 @@ print $FH "\n#endif\n";
 close($FH);
 if ($rebh) { exit 0 };
 
+my @rpmconstantfiles = qw(
+    rpmconstant.c
+    rpmconstant.h
+    rpmconstant_internal.c
+    rpmh2tbl
+    );
+
 my ($obj, $ldd, $fl) =
     -f '/usr/include/rpmconstant/rpmconstant.h' ?
     ('', '-lrpmconstant', '-DHAVE_RPMCONSTANT') :
@@ -44,26 +51,17 @@ rpmversion.h:
 
 rpmconstanttbl.c: Makefile rpmh2tbl
 	perl rpmh2tbl /usr/include/rpm/*.h > \$@
+
 RPMCONSTTBL
 	# This code is to reduce duplication of files
 	# in fact it is only usefull for the maintainers of this module
 	# if you get the module from CPAN, those files are allready here
 	# if you're building from svn, you need rpmconstant directory
-	my $second = "";
+	my $second = "copyrpmconstant: " . join(" ", @rpmconstantfiles) ."\n\n";
 	if(-d '../../rpmconstant') {
-	 $second = <<RPMCONST
-rpmconstant.c: ../../rpmconstant/rpmconstant.c
-	cp -a \$< \$@
-
-rpmconstant.h: ../../rpmconstant/rpmconstant.h
-	cp -a \$< \$@
-
-rpmconstant_internal.c: ../../rpmconstant/rpmconstant_internal.c
-	cp -a \$< \$@
-
-rpmh2tbl: ../../rpmconstant/rpmh2tbl
-	cp -a \$< \$@
-RPMCONST
+        foreach (@rpmconstantfiles) {
+            $second .= "$_: ../../rpmconstant/$_\n\tcp -a \$< \$@\n\n";
+        }
 	}
 
 	$first . $second
@@ -76,4 +74,5 @@ WriteMakefile(
     INC	         => '-I/usr/include/rpm',
     LIBS         => "-lrpm -lrpmio -lrpmdb -lrpmbuild -lpopt -lz -lbz2 $ldd",
     'CCFLAGS'    => $fl,
+    depend       => { "RPM4.xs" => join(" ", @rpmconstantfiles) },
 );
