@@ -18,6 +18,9 @@
 
 package RPM4::Header::Changelogs;
 
+use strict;
+use warnings;
+
 sub new {
     my ($class, $header) = @_;
 

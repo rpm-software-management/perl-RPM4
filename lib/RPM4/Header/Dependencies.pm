@@ -18,6 +18,9 @@
 
 package RPM4::Header::Dependencies;
 
+use strict;
+use warnings;
+
 sub new {
     my ($class, $deptag, $initdep, @depdesc) = @_;
     print "$deptag, $initdep\n";

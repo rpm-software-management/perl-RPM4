@@ -18,6 +18,9 @@
 
 package RPM4::Header::Files;
 
+use strict;
+use warnings;
+
 sub dircount {
     $_[0]->countdir();
 }
