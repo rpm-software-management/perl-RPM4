@@ -33,4 +33,12 @@ WriteMakefile(
     DIR          => [ 'src' ],
     'EXE_FILES'  => [ qw(bin/rpm_produced bin/rpmresign bin/hrpmreb) ],
     depend => { dist => 'copyrpmconstant' },
+    PREREQ_PM => {
+        Carp => 0,
+        'Digest::SHA1' => 0,
+        DynaLoader => 0,
+        Exporter => 0,
+        'File::Temp' => 0,
+        'MDV::Packdrakeng' => 0,
+    },
 );
