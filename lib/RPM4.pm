@@ -37,7 +37,7 @@ our @EXPORT = qw(moduleinfo
                  stream2header rpm2header
                  installsrpm
                  setverbosity setlogcallback format_rpmpb
-                 rpmresign 
+                 rpmresign dumpmacros dumprc
                  newdb parserpms);
 our %EXPORT_TAGS = (
     rpmlib => [qw(getosname getarchname dumprc dumpmacros rpmvercmp setverbosity setlogcallback
