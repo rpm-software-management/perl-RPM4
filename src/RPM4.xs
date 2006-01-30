@@ -406,6 +406,7 @@ void _newspec(rpmts ts, char * filename, SV * svpassphrase, SV * svrootdir, SV *
     char * cookies = NULL;
     int anyarch = 0;
     int force = 0;
+    dSP;
 
     if (svpassphrase && SvOK(svpassphrase))
         passphrase = SvPV_nolen(svpassphrase);
@@ -424,7 +425,6 @@ void _newspec(rpmts ts, char * filename, SV * svpassphrase, SV * svrootdir, SV *
     if (svforce && SvOK(svforce))
 	force = SvIV(svforce);
     
-    dSP;
     if (filename) {
         if (!parseSpec(ts, filename, rootdir, NULL, 0, passphrase, cookies, anyarch, force))
             spec = rpmtsSetSpec(ts, NULL);
@@ -2848,7 +2848,40 @@ Spec_sources_url(spec, is = 0)
         XPUSHs(sv_2mortal(newSVpv(dest, len)));
     }
 
-    
+void
+Spec_icon(spec)
+    Spec spec
+    PREINIT:
+    Package pkg;
+    PPCODE:
+    for (pkg = spec->packages; pkg != NULL; pkg = pkg->next) {
+        char * dest = NULL;
+        int len;
+        if (!pkg->icon)
+            continue;
+        len = strlen(pkg->icon->source);
+        dest = malloc(len);
+        memcpy(dest, pkg->icon->source, len);
+        XPUSHs(sv_2mortal(newSVpv(dest, len)));
+    }
+
+void
+Spec_icon_url(spec)
+    Spec spec
+    PREINIT:
+    Package pkg;
+    PPCODE:
+    for (pkg = spec->packages; pkg != NULL; pkg = pkg->next) {
+        char * dest = NULL;
+        int len;
+        if (!pkg->icon)
+            continue;
+        len = strlen(pkg->icon->fullSource);
+        dest = malloc(len);
+        memcpy(dest, pkg->icon->fullSource, len);
+        XPUSHs(sv_2mortal(newSVpv(dest, len)));
+    }
+
 MODULE = RPM4		PACKAGE = RPM4::Db::_Problems	PREFIX = ps_
 
 void
