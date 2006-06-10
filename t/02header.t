@@ -18,7 +18,7 @@ my $hdr = RPM4::Header->new("$Bin/test-rpm-1.0-1mdk.src.rpm");
 isa_ok($hdr, "RPM4::Header", "instanciating an header from a source rpm works");
 ok($hdr->hastag(1000) eq 1, "Has tag 1000 (NAME), yes");
 ok($hdr->hastag("NAME") eq 1, "Has 'NAME', yes");
-ok($hdr->hastag(1106) eq 1, "Has tag 1106 (SOURCEPACKAGE), yes");
+ok($hdr->hastag(1044) eq 0, "Has tag 1044 (SOURCERPM), yes");
 ok($hdr->listtag(), "can list tag");
 is($hdr->tag(1000), "test-rpm", "accessing tag by id works");
 is($hdr->tag("NAME"), "test-rpm", "accessing tag by name works");

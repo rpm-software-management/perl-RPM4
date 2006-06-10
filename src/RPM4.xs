@@ -64,6 +64,11 @@
      #define HD_HEADER_INTERNAL
 #endif
 
+#include "rpmversion.h"
+#ifdef RPM4_4_6
+    #define _RPMPS_INTERNAL
+#endif
+
 #include <rpm/header.h>
 #include <rpm/rpmio.h>
 #include <rpm/rpmdb.h>
@@ -1018,8 +1023,8 @@ Header_addtag(h, sv_tag, sv_tagtype, ...)
         RETVAL = 1;
     else
         RETVAL = 0;
-    if (tag == RPMTAG_OLDFILENAMES)
-        expandFilelist(h);
+    /* if (tag == RPMTAG_OLDFILENAMES)
+        expandFilelist(h); */
     for (i = 3; (i < items) && RETVAL; i++) {
         switch (tagtype) {
             case RPM_CHAR_TYPE:
@@ -1043,9 +1048,9 @@ Header_addtag(h, sv_tag, sv_tagtype, ...)
                 break;
         }
     }
-    if (tag == RPMTAG_OLDFILENAMES) {
-        compressFilelist(h);
-    }
+    /* if (tag == RPMTAG_OLDFILENAMES) {
+        compressFilelist(h); 
+    } */
     OUTPUT:
     RETVAL
     
@@ -1201,14 +1206,14 @@ Header_fullname(h)
                     name,
                     version,
                     release,
-                    headerIsEntry(h, RPMTAG_SOURCEPACKAGE) ? "src" : arch
+                    headerIsEntry(h, RPMTAG_SOURCERPM) ? arch : "src"
                     )));
         } else if (gimme == G_ARRAY) {
             EXTEND(SP, 4);
             PUSHs(sv_2mortal(newSVpv(name, 0)));
             PUSHs(sv_2mortal(newSVpv(version, 0)));
             PUSHs(sv_2mortal(newSVpv(release, 0)));
-            if (headerIsEntry(h, RPMTAG_SOURCEPACKAGE)) {
+            if (!headerIsEntry(h, RPMTAG_SOURCERPM)) {
                 PUSHs(sv_2mortal(newSVpv("src", 0)));
             } else {
                 PUSHs(sv_2mortal(newSVpv(arch, 0)));
@@ -1230,7 +1235,7 @@ int
 Header_issrc(h)
     Header h
     CODE:
-    RETVAL = headerIsEntry(h, RPMTAG_SOURCEPACKAGE);
+    RETVAL = !headerIsEntry(h, RPMTAG_SOURCERPM);
     OUTPUT:
     RETVAL
 
@@ -1631,10 +1636,14 @@ Ts_transadd(ts, header, key = NULL, upgrade = 1, sv_relocation = NULL, force = 0
     int force
     PREINIT:
     rpmRelocation * relocations = NULL;
+#ifdef RPM4_4_6
+    rpmRelocation relptr = NULL;
+#endif
     HV * hv_relocation;
     HE * he_relocation;
     int i = 0;
     I32 len;
+    
     CODE:
 
     if (key != NULL)
@@ -1653,22 +1662,42 @@ Ts_transadd(ts, header, key = NULL, upgrade = 1, sv_relocation = NULL, force = 0
         if (SvTYPE(sv_relocation) == SVt_PV) {
             /* String value, assume a prefix */
             relocations = malloc(2 * sizeof(*relocations));
+#ifdef RPM4_4_6
+            relptr = relocations[0];
+            relptr->newPath = SvPV_nolen(sv_relocation);
+            relptr = relocations[1];
+            relptr->oldPath = relptr->newPath = NULL;
+#else
             relocations[0].oldPath = NULL;
             relocations[0].newPath = SvPV_nolen(sv_relocation);
             relocations[1].oldPath = relocations[1].newPath = NULL;
+#endif
         } else if (SvTYPE(SvRV(sv_relocation)) == SVt_PVHV) {
             hv_relocation = (HV*)SvRV(sv_relocation);
             hv_iterinit(hv_relocation);
             while ((he_relocation = hv_iternext(hv_relocation)) != NULL) {
                 relocations = realloc(relocations, sizeof(*relocations) * (++i));
+#ifdef RPM4_4_6
+                relptr = relocations[i-1];
+                relptr->oldPath = NULL;
+                relptr->newPath = NULL;
+                relptr->oldPath = hv_iterkey(he_relocation, &len);
+                relptr->newPath = SvPV_nolen(hv_iterval(hv_relocation, he_relocation));
+#else
                 relocations[i-1].oldPath = NULL;
                 relocations[i-1].newPath = NULL;
                 relocations[i-1].oldPath = hv_iterkey(he_relocation, &len);
                 relocations[i-1].newPath = SvPV_nolen(hv_iterval(hv_relocation, he_relocation));
+#endif
             }
             /* latest relocation is identify by NULL setting */
             relocations = realloc(relocations, sizeof(*relocations) * (++i));
+#ifdef RPM4_4_6
+            relptr = relocations[i-1];
+            relptr->oldPath = relptr->newPath = NULL;
+#else 
             relocations[i-1].oldPath = relocations[i-1].newPath = NULL;
+#endif
         } else {
             croak("latest argument is set but is not an array ref or a string");
         }
@@ -2556,7 +2585,13 @@ Files_md5(Files)
     const byte * md5;
     char * fmd5 = malloc((char) 33);
     PPCODE:
-    if ((md5 = rpmfiMD5(Files)) != NULL && *md5 != 0 /* return undef if empty */) {
+    if ((md5 = 
+#ifdef RPM4_4_6
+        rpmfiDigest(Files, NULL, NULL)
+#else
+        rpmfiMD5(Files)
+#endif
+            ) != NULL && *md5 != 0 /* return undef if empty */) {
         (void) pgpHexCvt(fmd5, md5, 16);
         XPUSHs(sv_2mortal(newSVpv(fmd5, 0)));
     }
