@@ -9,7 +9,7 @@ my $rpm_version = `rpm --version`;
 $rpm_version =~ s/RPM version //;
 $rpm_version =~ /^(?:[5-9]|\d{2}|4\.[2-9])/
     or die <<BARF;
-Unable to build Hdlist with too old (or undetected) rpm version $rpm_version
+Unable to build RPM4 with too old (or undetected) rpm version $rpm_version
 BARF
 
 sub MY::postamble {
