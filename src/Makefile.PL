@@ -35,12 +35,12 @@ foreach (qw(
     4.4.2
     4.4.3
     4.4.4
+    4.4.6
     )) {
-    if ($rpmv ge $_) {
-        $v = $_;
-        $v =~ s/\./_/g;
-        print $FH "#define RPM$v\n";
-    }
+    $v = $_;
+    $v =~ s/\./_/g;
+    print $FH "#define RPM$v\n";
+    $rpmv eq $_ and last;
 }
 print $FH "\n#endif\n";
 close($FH);
