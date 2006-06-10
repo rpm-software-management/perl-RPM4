@@ -72,10 +72,10 @@
 #include <rpm/header.h>
 #include <rpm/rpmio.h>
 #include <rpm/rpmdb.h>
+#include <rpm/rpmds.h>
 #include <rpm/rpmts.h>
 #include <rpm/rpmte.h>
 #include <rpm/rpmps.h>
-#include <rpm/rpmds.h>
 #include <rpm/rpmfi.h>
 #include <rpm/rpmpgp.h>
 #include <rpm/misc.h>
@@ -176,10 +176,21 @@ static rpmTag sv2dbquerytag(SV * sv_tag) {
 /* This function replace the standard rpmShowProgress callback
  * during transaction to allow perl callback */
 
-void * transCallback(const void *h,
+#ifdef RPM4_4_5
+#define RPM_CALLBACK_AMOUNT_TYPE unsigned long long
+#else
+#define RPM_CALLBACK_AMOUNT_TYPE unsigned long
+#endif
+
+#ifdef RPM4_4_5
+rpmCallbackFunction
+#else
+void *
+#endif 
+    transCallback(const void *h,
        const rpmCallbackType what,
-       const unsigned long amount,
-       const unsigned long total,
+       const RPM_CALLBACK_AMOUNT_TYPE amount,
+       const RPM_CALLBACK_AMOUNT_TYPE total,
        const void * pkgKey,
        void * data) {
     
@@ -1276,16 +1287,16 @@ Header_files(header, scaremem = O_SCAREMEM)
     Header header
     int scaremem
     PREINIT:
-    rpmfi Files;
-    rpmts ts = NULL; /* setting this to NULL skip path relocation
+    rpmfi Files = NULL;
+    rpmts ts = NULL;  /* NULL;  setting this to NULL skip path relocation
                        * maybe a good deal is Header::Files(header, Dep = NULL) */
     PPCODE:
 #ifdef HDLISTDEBUG
     PRINTF_CALL;
 #endif
     Files = rpmfiNew(ts, header, RPMTAG_BASENAMES, scaremem);
-    if ((Files = rpmfiInit(Files, 0)) != NULL && rpmfiNext(Files) >= 0) {
-        XPUSHs(sv_2mortal(sv_setref_pv(newSVpv("", 0), bless_rpmfi, Files)));
+    if (Files != NULL && (Files = rpmfiInit(Files, 0)) != NULL && rpmfiNext(Files) >= 0) { 
+        XPUSHs(sv2_mortal(sv_setref_pv(newSVpv("", 0), bless_rpmfi, Files)));
 #ifdef HDRPMMEM
         PRINTF_NEW(bless_rpmfi, Files, Files->nrefs);
 #endif
@@ -1846,7 +1857,9 @@ Ts_transrun(ts, callback, ...)
                 (void *) ((long) INSTALL_LABEL | INSTALL_HASH | INSTALL_UPGRADE));
     } else if (SvTYPE(SvRV(callback)) == SVt_PVCV) { /* ref sub */
         rpmtsSetNotifyCallback(ts,
-                transCallback, (void *) callback);
+                transCallback, 
+                (void *)
+                    callback);
     } else if (SvTYPE(SvRV(callback)) == SVt_PVAV) { /* array ref */
         install_flags = sv2constant(callback, "rpminstallinterfaceflags");
         rpmtsSetNotifyCallback(ts,
