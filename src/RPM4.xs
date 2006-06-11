@@ -1293,10 +1293,10 @@ Header_files(header, scaremem = O_SCAREMEM)
     PPCODE:
 #ifdef HDLISTDEBUG
     PRINTF_CALL;
-#endif
-    SPAGAIN; 
+#endif 
     Files = rpmfiNew(ts, header, RPMTAG_BASENAMES, scaremem);
     if (Files != NULL && (Files = rpmfiInit(Files, 0)) != NULL && rpmfiNext(Files) >= 0) {
+        SPAGAIN;
         XPUSHs(sv_setref_pv(sv_newmortal(), bless_rpmfi, (void *)Files));
 #ifdef HDRPMMEM
         PRINTF_NEW(bless_rpmfi, Files, Files->nrefs);
