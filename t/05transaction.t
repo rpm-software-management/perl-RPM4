@@ -13,13 +13,12 @@ RPM4::add_macro("_dbpath /dev/null");
 ok(RPM4::rpmdbverify() != 0, "Verify non existing database (get error)");
 
 my $tempdir = tempdir();
-rmtree($tempdir) if $tempdir;
 my $testdir = "$tempdir/testdb";
-mkdir $testdir;
+mkdir $testdir || die $!;
 
 RPM4::add_macro("_dbpath $testdir");
 
-ok(RPM4::rpmdbinit() == 0, "initdb works");
+ok(RPM4::rpmdbinit() == 0 || -f "$testdir/Packages", "initdb works");
 ok(RPM4::rpmdbrebuild() == 0, "rebuild database");
 ok(RPM4::rpmdbverify() == 0, "Verify empty");
 

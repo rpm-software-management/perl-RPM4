@@ -1379,7 +1379,7 @@ rpmdbinit(rootdir = NULL)
     /* rpm{db,ts}init is deprecated, we open a database with create flags
      *  and close it */
     /* 0 on success */
-    RETVAL = rpmtsOpenDB(ts, O_CREAT);
+    RETVAL = rpmtsOpenDB(ts, O_RDWR | O_CREAT);
     ts = rpmtsFree(ts);
     OUTPUT:
     RETVAL
