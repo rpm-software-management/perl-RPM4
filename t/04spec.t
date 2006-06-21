@@ -1,7 +1,7 @@
 # $Id$
 
 use strict;
-use Test::More tests => 23;
+use Test::More tests => 24;
 use FindBin qw($Bin);
 use File::Temp qw(tempdir);
 use RPM4;
@@ -55,6 +55,7 @@ ok($spec->build([ qw(RMBUILD RMSOURCE) ]) == 0, "simulate cleaning spec, source,
 
 ok(defined($h = $spec->srcheader()), "Geting source header after build");
 ok($h->queryformat("%{NAME}") eq "test-rpm", "can querying header give by spec");
+is($h->tag("URL"), "http://rpm4.zarb.org/", "can get url give by spec");
 
 my ($bh) = $spec->binheader();
 ok(defined($bh), "Can get binary header from spec");
