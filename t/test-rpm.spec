@@ -7,6 +7,7 @@ Release: 1mdk
 License: GPL
 Group: Application/Development
 BuildRoot: %{_tmppath}/%{name}-root
+Url: http://rpm4.zarb.org/
 
 %description
 test rpm

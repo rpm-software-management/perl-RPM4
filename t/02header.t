@@ -1,7 +1,7 @@
 # $Id$
 
 use strict;
-use Test::More tests => 40;
+use Test::More tests => 41;
 use FindBin qw($Bin);
 use RPM4;
 
@@ -22,6 +22,7 @@ ok($hdr->hastag(1044) eq 0, "Has tag 1044 (SOURCERPM), yes");
 ok($hdr->listtag(), "can list tag");
 is($hdr->tag(1000), "test-rpm", "accessing tag by id works");
 is($hdr->tag("NAME"), "test-rpm", "accessing tag by name works");
+is($hdr->tag("URL"), "http://rpm4.zarb.org/", "accessing tag by name works");
 is($hdr->NAME(), "test-rpm", "accessing tag directly works");
 ok($hdr->queryformat("%{NAME}-%{VERSION}-%{RELEASE}") eq "test-rpm-1.0-1mdk", "Queryformat is ok");
 ok($hdr->nevr() eq "test-rpm-1.0-1mdk", "header->nevr works");
