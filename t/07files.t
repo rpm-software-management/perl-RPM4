@@ -30,7 +30,7 @@ ok(defined($files->basename()), "Can get Files::basename()");
 ok(defined($files->fflags()), "Can get Files::fflags()");
 is(
     $files->md5(),
-    "b9cb4e3dc1b8007e5c9678d1acecac47",
+    "6e5e49d3e3743eb3d5737ce8aca1fb02",
     "md5 is OK"
 );
 ok(!defined($files->link()), "Can get Files::link()");
