@@ -276,7 +276,6 @@ void *
     XPUSHs(sv_2mortal(newSVpv("total", 0)));
     XPUSHs(sv_2mortal(newSViv(total)));
     PUTBACK;
-        fprintf(stderr, "%x\n", data);
     call_sv((SV *) data, G_DISCARD | G_SCALAR);
     SPAGAIN;
   
@@ -1858,7 +1857,6 @@ Ts_transrun(ts, callback, ...)
                 rpmShowProgress,
                 (void *) ((long) INSTALL_LABEL | INSTALL_HASH | INSTALL_UPGRADE));
     } else if (SvTYPE(SvRV(callback)) == SVt_PVCV) { /* ref sub */
-        fprintf(stderr, "%x\n", callback);
         rpmtsSetNotifyCallback(ts,
                 transCallback, 
                 (void *)
