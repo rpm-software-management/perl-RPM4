@@ -19,32 +19,78 @@ use warnings;
 
 use Getopt::Long;
 use RPM4::Sign;
+use Pod::Usage;
 
-my ($configfile, $batch, $sigtype, $passfile, $macrofile, $fastmode, $path, $name, $keyid, $pass);
+my ($batch, $sigtype, $passfile, $macrofile, $fastmode, $path, $name, $keyid, $pass);
 my @defines;
+
+=head1 NAME
+
+rpmresign
+
+=head1 DESCRIPTION
+
+Resign massively rpm file
+
+=head1 SYNOPSIS
+
+rpmresign [--passwordfile file] rpmfile or directory
+
+=cut
 
 GetOptions(
     'p|path=s' => \$path,
     'n|name=s' => \$name,
-    'c|config=s' => \$configfile,
     'b|batch' => \$batch,
     'd|define=s' => \@defines,
     'f|fastmode' => \$fastmode,
     'passwordfile|sig-pass-file=s' => \$passfile,
     'm|macros=s' => \$macrofile,
-);
+    'help|h' => sub { pod2usage(0) },
+) or pod2usage(1);
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>
+
+Print help
+
+=item B<--passwordfile>
+
+Read passphrase from this file
+
+=item B<--name>
+
+Use this name as gpg identity
+
+=item B<--macros>
+
+Load this macros file before processing
+
+=item B<--define>
+
+Define a rpm macro. This option is similar to --define of rpm.
+
+=item B<--path>
+
+Set gpghome to this directory
+
+=item B<-f>
+
+Fastmode: don't check rpm md5sum signatures before processing
+
+=back
+
+=cut
 
 foreach (@defines) {
     RPM4::add_macro($_);
 }
 
-if (!$passfile) {
-    $pass = <STDIN>;
-    chomp($pass);
-}
-
 my $sign = RPM4::Sign->new(
-    passphrase => $pass,
+    passphrase => $ENV{RPMRESIGN_PASSPHRASE},
     _signature => $sigtype,
     path => $path,
     name => $name,
@@ -63,3 +109,31 @@ while (my $f = shift(@ARGV)) {
 }
 
 $sign->rpmssign(@files);
+
+__END__
+
+=head1 DESCRIPTION
+
+rpmresign is a perl script to massivelly resign rpms. Only rpm which does
+not have the proper signature are resigned.
+
+The script will resign all rpms given on the command line or all rpms inside
+directories (rpms are find with a glob on *.rpm).
+
+The passphrase can be passed from a file B<--passwordfile> or by setting the
+envirronement variable B<RPMRESIGN_PASSPHRASE>
+
+=head1 AUTHOR
+
+Olivier Thauvin <nanardon@zarb.org>
+
+=head1 SEE ALSO
+
+B<RPM4> perl module
+http://rpm4.zarb.org/
+
+=head1 LICENSE
+
+Gnu Public License version 2 or later.
+
+=cut
