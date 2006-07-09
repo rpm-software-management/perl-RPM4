@@ -330,6 +330,16 @@ Returns true if package is a source package.
 Compare the header to another, return 1 if the object is higher, -1 if
 header passed as argument is better, 0 if update is not possible.
 
+=head2 dep($deptype)
+
+Return a RPM4::Header::Dependencies object containing dependencies of type
+$deptype found in the header.
+
+=head2 files()
+
+Return a RPM4::Header::Files object containing the set of files include in
+the rpm.
+
 =head1 SEE ALSO
 
 L<RPM4>
