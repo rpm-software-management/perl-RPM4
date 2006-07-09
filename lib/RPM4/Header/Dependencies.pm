@@ -23,10 +23,8 @@ use warnings;
 
 sub new {
     my ($class, $deptag, $initdep, @depdesc) = @_;
-    print "$deptag, $initdep\n";
     my $dep = RPM4::Header::Dependencies->newsingle($deptag, @$initdep) or return;
     foreach (@depdesc) {
-        print "$_\n";
         $dep->add(@$_);
     }
     return $dep;
