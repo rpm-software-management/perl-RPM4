@@ -720,13 +720,13 @@ expandnumeric(name)
     XPUSHs(sv_2mortal(newSViv(value)));
     
 void
-add_macro(macro)
+addmacro(macro)
     char * macro
     CODE:
     rpmDefineMacro(NULL, macro, RMIL_DEFAULT);
 
 void
-del_macro(name)
+delmacro(name)
     char * name
     CODE:
     delMacro(NULL, name);

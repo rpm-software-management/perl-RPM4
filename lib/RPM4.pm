@@ -180,9 +180,11 @@ sub format_rpmpb {
 # Alias for compatiblity #
 ##########################
 
-sub specnew {
-    newspec(@_);
-}
+sub specnew { newspec(@_) }
+
+sub add_macro { addmacro(@_) }
+
+sub del_macro { delmacro(@_) }
 
 1;
 
@@ -303,15 +305,15 @@ Evaluate macros contained in C<$string>, like C<rpm --eval>.
 
     expand("%_var") return "/var".
 
-=head2 add_macro("_macro value")
+=head2 addmacro("_macro value")
 
 Define a macro into rpmlib. The macro is defined for the whole script. Ex:
-C<add_macro("_macro value")>. Note that the macro name does have the prefix
+C<addmacro("_macro value")>. Note that the macro name does have the prefix
 "%", to prevent rpm from evaluating it.
 
 =head2 del_macro("_macro")
 
-Delete a macro from rpmlib. Exactly the reverse of add_macro().
+Delete a macro from rpmlib. Exactly the reverse of addmacro().
 
 =head2 loadmacrosfile($filename)
 

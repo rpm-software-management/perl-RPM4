@@ -39,13 +39,13 @@ Options:
   --no-src                   do not show the src.rpm
 ";
 
-RPM4::add_macro("_sourcedir $tmp");
-RPM4::add_macro("_specdir $tmp");
+RPM4::addmacro("_sourcedir $tmp");
+RPM4::addmacro("_specdir $tmp");
 
 sub set_config {
     RPM4::readconfig();
     foreach (@macros) {
-        RPM4::add_macro($_);
+        RPM4::addmacro($_);
     }
 }
 
