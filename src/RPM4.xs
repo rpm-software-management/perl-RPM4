@@ -34,8 +34,8 @@
 #undef Stat
 
 /* copy data into rpm or use the header */
-#define O_SCAREMEM 1 /* If returning perl object */
-#define SCAREMEM 1
+#define O_SCAREMEM 0 /* If returning perl object */
+#define SCAREMEM 0
 
 /* Pre processor flags for debugging purpose */
 
@@ -1271,7 +1271,13 @@ Header_dep(header, type, scaremem = O_SCAREMEM)
     rpmTag tag;
     PPCODE:
     tag = sv2deptag(type);
-    ds = rpmdsNew(header, tag, scaremem);
+    ds = rpmdsNew(header, tag,
+#ifdef RPM4_4_7
+        0
+#else
+        scaremem
+#endif
+    );
     ds = rpmdsInit(ds);
     if (ds != NULL)
         if (rpmdsNext(ds) >= 0) {
