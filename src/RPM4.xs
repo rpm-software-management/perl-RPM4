@@ -2596,7 +2596,7 @@ void
 Files_mode(Files)
     rpmfi Files
     PPCODE:
-    XPUSHs(sv_2mortal(newSViv(rpmfiFMode(Files))));
+    XPUSHs(sv_2mortal(newSVuv(rpmfiFMode(Files))));
 
 void
 Files_md5(Files)

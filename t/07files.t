@@ -1,7 +1,7 @@
 # $Id$
 
 use strict;
-use Test::More tests => 10;
+use Test::More tests => 11;
 use FindBin qw($Bin);
 use RPM4;
 
@@ -35,3 +35,4 @@ is(
 );
 ok(!defined($files->link()), "Can get Files::link()");
 ok(defined($files->mode()), "Can get Files::mode()");
+ok($files->mode() > 0, "Files::mode() is positive value");
