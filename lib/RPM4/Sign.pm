@@ -28,7 +28,7 @@ sub new {
         name => undef,
         path => undef,
         checkrpms => 1,
-        passphrase => undef
+        passphrase => undef,
 
         password_file => undef,
 
