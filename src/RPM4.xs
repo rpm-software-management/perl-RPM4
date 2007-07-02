@@ -415,13 +415,14 @@ void _newdep(SV * sv_deptag, char * name, SV * sv_sense, SV * sv_evr) {
 }
 
 /* Get a new specfile */
-void _newspec(rpmts ts, char * filename, SV * svpassphrase, SV * svrootdir, SV * svcookies, SV * svanyarch, SV * svforce) {
+void _newspec(rpmts ts, char * filename, SV * svpassphrase, SV * svrootdir, SV * svcookies, SV * svanyarch, SV * svforce, SV * svverify) {
     Spec spec = NULL;
     char * passphrase = NULL;
     char * rootdir = NULL;
     char * cookies = NULL;
     int anyarch = 0;
     int force = 0;
+    int verify = 0;
     dSP;
 
     if (svpassphrase && SvOK(svpassphrase))
@@ -441,8 +442,11 @@ void _newspec(rpmts ts, char * filename, SV * svpassphrase, SV * svrootdir, SV *
     if (svforce && SvOK(svforce))
 	force = SvIV(svforce);
     
+    if (svverify && SvOK(svverify))
+	verify = SvIV(svverify);
+    
     if (filename) {
-        if (!parseSpec(ts, filename, rootdir, NULL, 0, passphrase, cookies, anyarch, force))
+        if (!parseSpec(ts, filename, rootdir, 0, passphrase, cookies, anyarch, force, verify))
             spec = rpmtsSetSpec(ts, NULL);
 #ifdef HHACK
     } else {
@@ -2687,18 +2691,19 @@ Files_nlink(Files)
 MODULE = RPM4     PACKAGE = RPM4
 
 void
-newspec(filename = NULL, passphrase = NULL, rootdir = NULL, cookies = NULL, anyarch = NULL, force = NULL)
+newspec(filename = NULL, passphrase = NULL, rootdir = NULL, cookies = NULL, anyarch = NULL, force = NULL, verify = NULL)
     char * filename 
     SV * passphrase
     SV * rootdir
     SV * cookies
     SV * anyarch
     SV * force
+    SV * verify
     PREINIT:
     rpmts ts = rpmtsCreate();
     PPCODE:
     PUTBACK;
-    _newspec(ts, filename, passphrase, rootdir, cookies, anyarch, force);
+    _newspec(ts, filename, passphrase, rootdir, cookies, anyarch, force, verify);
     ts = rpmtsFree(ts);
     SPAGAIN;
 
@@ -2715,6 +2720,7 @@ Spec_new(perlclass, specfile = NULL, ...)
     SV * cookies = NULL;
     SV * anyarch = 0;
     SV * force = 0;
+    SV * verify = 0;
     int i;
     PPCODE:
     for(i=2; i < items; i++) {
@@ -2730,6 +2736,9 @@ Spec_new(perlclass, specfile = NULL, ...)
         } else if (strcmp(SvPV_nolen(ST(i)), "force") == 0) {
             i++;
             force = ST(i);
+        } else if (strcmp(SvPV_nolen(ST(i)), "verify") == 0) {
+            i++;
+            verify = ST(i);
         } else if (strcmp(SvPV_nolen(ST(i)), "anyarch") == 0) {
             i++;
             anyarch = ST(i);
@@ -2747,7 +2756,7 @@ Spec_new(perlclass, specfile = NULL, ...)
     if (!ts)
         ts = rpmtsCreate();
     PUTBACK;
-    _newspec(ts, specfile, passphrase, rootdir, cookies, anyarch, force);
+    _newspec(ts, specfile, passphrase, rootdir, cookies, anyarch, force, verify);
     SPAGAIN;
     ts = rpmtsFree(ts);
     
