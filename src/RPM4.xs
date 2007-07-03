@@ -791,6 +791,20 @@ archscore(arch, build = 0)
     OUTPUT:
     RETVAL
     
+int
+platformscore(platform)
+    const char * platform
+    PREINIT:
+    CODE:
+#ifdef RPM4_4_8
+    RETVAL=rpmPlatformScore(platform, NULL, 0);
+#else
+    RETVAL=0;
+    croak("platformscore exists only from rpm 4.4.8");
+#endif
+    OUTPUT:
+    RETVAL
+
 void
 buildhost()
     PPCODE:

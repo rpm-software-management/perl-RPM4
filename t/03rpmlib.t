@@ -1,7 +1,7 @@
 # $Id$
 
 use strict;
-use Test::More tests => 52;
+use Test::More tests => 53;
 use FindBin qw($Bin);
 use RPM4;
 
@@ -27,6 +27,12 @@ close($null);
 ok(length(RPM4::getosname), "Return OS name");
 ok(length(RPM4::getarchname), "Return arch name");
 ok(length(RPM4::buildhost), "Return buildhost");
+SKIP: {
+    eval { RPM4::platformscore(""); };
+    skip "no RPM4::platformscore()", 1 if($@);
+
+ok(RPM4::platformscore("any-any-nonos") == 0, "can evaluate platform score");
+}
 
 # Playing with macros
 my $target_cpu = RPM4::expand("%_target_cpu");
