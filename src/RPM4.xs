@@ -994,21 +994,15 @@ Header_string(h, no_header_magic = 0)
     int no_header_magic
     PREINIT:
     char * string = NULL;
-    int offset = 0;
+    int offset = 8; /* header magic length */
     void * ptr = NULL;
     int hsize = 0;
     PPCODE:
-    ptr = headerUnload(h);
-    hsize = headerSizeof(h, no_header_magic ? HEADER_MAGIC_NO : HEADER_MAGIC_YES);
-    string = malloc(hsize);
-    if (!no_header_magic) {
-        memcpy(string, header_magic, sizeof(header_magic));
-        offset = sizeof(header_magic);
-    }
-    memcpy(string + offset, ptr, headerSizeof(h, HEADER_MAGIC_NO));
-    PUSHs(sv_2mortal(newSVpv((char *)string, hsize)));
-    free(ptr);
-
+    string = headerUnload(h);
+    hsize = headerSizeof((Header) string, no_header_magic ? HEADER_MAGIC_NO : HEADER_MAGIC_YES);
+    ptr = string + (no_header_magic ? offset : 0);
+    PUSHs(sv_2mortal(newSVpv((char *)ptr, hsize)));
+    free(string);
 
 int
 Header_removetag(h, sv_tag)
@@ -1204,14 +1198,7 @@ Header_queryformat(h, query)
     PPCODE:
     s = headerSprintf(h, query,
             rpmTagTable, rpmHeaderFormats, NULL);
-    if (s) {
-        char * cs = NULL;
-        int len = strlen(s);
-        
-        cs = malloc(strlen(s)); /* TODO need to check return of malloc */
-        memcpy(cs, s, len);
-        XPUSHs(sv_2mortal(newSVpv(cs, len)));
-    }
+    XPUSHs(sv_2mortal(newSVpv(s, 0)));
     _free(s);
 
 void
