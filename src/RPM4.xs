@@ -2885,14 +2885,8 @@ Spec_sources(spec, is = 0)
     struct Source *srcPtr;
     PPCODE:
     for (srcPtr = spec->sources; srcPtr != NULL; srcPtr = srcPtr->next) {
-        char * dest = NULL;
-        int len;
         if (is && !(srcPtr->flags & is))
-            continue;
-        len = strlen(srcPtr->source);
-        dest = malloc(len);
-        memcpy(dest, srcPtr->source, len);
-        XPUSHs(sv_2mortal(newSVpv(dest, len)));
+        XPUSHs(sv_2mortal(newSVpv(srcPtr->source, 0)));
     }
 
 void
@@ -2903,14 +2897,9 @@ Spec_sources_url(spec, is = 0)
     struct Source * srcPtr;
     PPCODE:
     for (srcPtr = spec->sources; srcPtr != NULL; srcPtr = srcPtr->next) {
-        char * dest = NULL;
-        int len;
         if (is && !(srcPtr->flags & is))
             continue;
-        len = strlen(srcPtr->fullSource);
-        dest = malloc(len);
-        memcpy(dest, srcPtr->fullSource, len);
-        XPUSHs(sv_2mortal(newSVpv(dest, len)));
+        XPUSHs(sv_2mortal(newSVpv(srcPtr->fullSource, 0)));
     }
 
 void
