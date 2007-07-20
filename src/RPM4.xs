@@ -2810,6 +2810,7 @@ Spec_binrpm(spec)
     Package pkg;
     const char * binFormat;
     char * binRpm;
+    char * path;
     PPCODE:
     for(pkg = spec->packages; pkg != NULL; pkg = pkg->next) {
         if (pkg->fileList == NULL)
@@ -2819,7 +2820,9 @@ Spec_binrpm(spec)
         binRpm = headerSprintf(pkg->header, binFormat, rpmTagTable,
                    rpmHeaderFormats, NULL);
         _free(binFormat);
-        XPUSHs(sv_2mortal(newSVpv(rpmGetPath("%{_rpmdir}/", binRpm, NULL), 0)));
+        path = rpmGetPath("%{_rpmdir}/", binRpm, NULL);
+        XPUSHs(sv_2mortal(newSVpv(path, 0)));
+        _free(path);
         _free(binRpm);
     }
 
