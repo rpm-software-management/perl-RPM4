@@ -1,7 +1,7 @@
 # $Id$
 
 use strict;
-use Test::More tests => 41;
+use Test::More tests => 42;
 use FindBin qw($Bin);
 use RPM4;
 
@@ -34,6 +34,7 @@ ok($hdr->removetag(1000) == 0, "Removing a tag");
 ok(! defined $hdr->tag(1000), "tag is not present");
 ok($hdr->addtag(1000, 6, "new name") == 1, "Adding a tag (string type)");
 ok($hdr->tag(1000) eq "new name", "Added tag return good value");
+ok($hdr->string, "can get header as string");
 }
 
 {

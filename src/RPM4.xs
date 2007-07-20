@@ -998,10 +998,10 @@ Header_string(h, no_header_magic = 0)
     void * ptr = NULL;
     int hsize = 0;
     PPCODE:
+    hsize = headerSizeof(h, no_header_magic ? HEADER_MAGIC_NO : HEADER_MAGIC_YES);
     string = headerUnload(h);
-    hsize = headerSizeof((Header) string, no_header_magic ? HEADER_MAGIC_NO : HEADER_MAGIC_YES);
     ptr = string + (no_header_magic ? offset : 0);
-    PUSHs(sv_2mortal(newSVpv((char *)ptr, hsize)));
+    XPUSHs(sv_2mortal(newSVpv((char *)ptr, hsize)));
     free(string);
 
 int
