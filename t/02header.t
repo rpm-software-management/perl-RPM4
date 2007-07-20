@@ -1,9 +1,10 @@
 # $Id$
 
 use strict;
-use Test::More tests => 42;
+use Test::More tests => 45;
 use FindBin qw($Bin);
 use RPM4;
+use File::Temp;
 
 my $headerfile;
 
@@ -34,7 +35,6 @@ ok($hdr->removetag(1000) == 0, "Removing a tag");
 ok(! defined $hdr->tag(1000), "tag is not present");
 ok($hdr->addtag(1000, 6, "new name") == 1, "Adding a tag (string type)");
 ok($hdr->tag(1000) eq "new name", "Added tag return good value");
-ok($hdr->string, "can get header as string");
 }
 
 {
@@ -77,4 +77,16 @@ unlink($headerfile);
 ok($hdr2->tag(1000) eq 'test-rpm', "tag 1000 from header file works");
 }
 
+{
 
+my $hdr = RPM4::Header->new("$Bin/test-rpm-1.0-1mdk.noarch.rpm");
+foreach my $magic (0, 1) {
+my $string = $hdr->string($magic);
+ok($string, "can get header as string");
+my $hdl = File::Temp->new(UNLINK => 1);
+print $hdl $string;
+seek($hdl, 0, 0);
+my $hdr2 = RPM4::stream2header($hdl);
+isa_ok($hdr, "RPM4::Header", "can reparse header from a string");
+}
+}
