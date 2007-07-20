@@ -2886,6 +2886,7 @@ Spec_sources(spec, is = 0)
     PPCODE:
     for (srcPtr = spec->sources; srcPtr != NULL; srcPtr = srcPtr->next) {
         if (is && !(srcPtr->flags & is))
+            continue;
         XPUSHs(sv_2mortal(newSVpv(srcPtr->source, 0)));
     }
 

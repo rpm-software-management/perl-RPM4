@@ -1,7 +1,7 @@
 # $Id$
 
 use strict;
-use Test::More tests => 24;
+use Test::More tests => 27;
 use FindBin qw($Bin);
 use File::Temp qw(tempdir);
 use RPM4;
@@ -61,3 +61,6 @@ my ($bh) = $spec->binheader();
 ok(defined($bh), "Can get binary header from spec");
 ok($bh->queryformat("%{NAME}") eq "test-rpm", "can querying header give by spec");
 
+ok($spec = RPM4::Spec->new("$Bin/test-source.spec", force => 1), "can load spec");
+is(($spec->sources)[0], 'source.tar.gz', "can list source");
+is(($spec->sources_url)[0], 'http://rpm4.zarb.org/source.tar.gz', "can list source with url");
