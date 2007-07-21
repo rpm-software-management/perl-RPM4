@@ -995,14 +995,19 @@ Header_string(h, no_header_magic = 0)
     PREINIT:
     char * string = NULL;
     int offset = 8; /* header magic length */
-    void * ptr = NULL;
+    char * ptr = NULL;
     int hsize = 0;
     PPCODE:
     hsize = headerSizeof(h, no_header_magic ? HEADER_MAGIC_NO : HEADER_MAGIC_YES);
     string = headerUnload(h);
-    ptr = string + (no_header_magic ? offset : 0);
-    XPUSHs(sv_2mortal(newSVpv((char *)ptr, hsize)));
+    if (! no_header_magic) {
+        ptr = malloc(hsize);
+        memcpy(ptr, header_magic, 8);
+        memcpy(ptr + 8, string, hsize - 8);
+    }
+    XPUSHs(sv_2mortal(newSVpv(ptr ? ptr : string, hsize)));
     free(string);
+    free(ptr);
 
 int
 Header_removetag(h, sv_tag)

@@ -86,7 +86,7 @@ ok($string, "can get header as string");
 my $hdl = File::Temp->new(UNLINK => 1);
 print $hdl $string;
 seek($hdl, 0, 0);
-my $hdr2 = RPM4::stream2header($hdl);
-isa_ok($hdr, "RPM4::Header", "can reparse header from a string");
+my $hdr2 = RPM4::stream2header($hdl, $magic);
+isa_ok($hdr2, "RPM4::Header", "can reparse header from a string");
 }
 }
