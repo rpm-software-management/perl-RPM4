@@ -715,6 +715,7 @@ expand(name)
     PPCODE:
     const char * value = rpmExpand(name, NULL);
     XPUSHs(sv_2mortal(newSVpv(value, 0)));
+    free(value);
 
 void
 expandnumeric(name)
@@ -807,6 +808,7 @@ platformscore(platform)
 
 void
 buildhost()
+    PREINIT:
     PPCODE:
     XPUSHs(sv_2mortal(newSVpv(buildHost(),0)));
     
