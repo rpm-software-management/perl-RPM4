@@ -475,12 +475,14 @@ void _installsrpms(rpmts ts, char * filename) {
     const char * specfile = NULL;
     const char * cookies = NULL;
     dSP;
+    I32 gimme = GIMME_V;
     if (rpmInstallSource(
                 ts,
                 filename,
                 &specfile,
                 &cookies) == 0) { 
         XPUSHs(sv_2mortal(newSVpv(specfile, 0)));
+        if (gimme == G_ARRAY)
         XPUSHs(sv_2mortal(newSVpv(cookies, 0)));
     }
     PUTBACK;

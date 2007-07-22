@@ -1,7 +1,7 @@
 # $Id$
 
 use strict;
-use Test::More tests => 27;
+use Test::More tests => 28;
 use FindBin qw($Bin);
 use File::Temp qw(tempdir);
 use RPM4;
@@ -21,6 +21,7 @@ RPM4::add_macro("_gpg_name RPM4 test key");
 RPM4::add_macro("_gpg_path $Bin/gnupg");
 
 ok((RPM4::installsrpm("$Bin/test-rpm-1.0-1mdk.src.rpm"))[0] =~ m/test-rpm\.spec$/, "installsrpms works");
+like(RPM4::installsrpm("$Bin/test-rpm-1.0-1mdk.src.rpm"), '/test-rpm\.spec$/', "installsrpms works");
 ok(!RPM4::installsrpm("$Bin/test-rpm-1.0-1mdk.noarch.rpm"), "installsrpms works");
 
 my $spec;
