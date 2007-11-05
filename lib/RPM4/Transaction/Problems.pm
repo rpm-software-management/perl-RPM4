@@ -88,6 +88,10 @@ when trying to install or removing rpms from the system.
 Create a new problems collection from transaction. Return undef if now
 problems has been found in the transaction.
 
+=head2 $pbs->count
+
+Return the count of problems in the object
+
 =head2 $pbs->init
 
 Reset internal index and set it to -1, see L<$deps-\\>hasnext()>
