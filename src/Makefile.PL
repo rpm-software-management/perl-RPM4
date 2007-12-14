@@ -43,7 +43,7 @@ foreach (qw(
     $v = $_;
     $v =~ s/\./_/g;
     print $FH "#define RPM$v\n";
-    $rpmv eq $_ and last;
+    $rpmv =~ /^\Q$_/ and last;
 }
 print $FH "\n#endif\n";
 close($FH);

@@ -446,7 +446,15 @@ void _newspec(rpmts ts, char * filename, SV * svpassphrase, SV * svrootdir, SV *
 	verify = SvIV(svverify);
     
     if (filename) {
-        if (!parseSpec(ts, filename, rootdir, 0, passphrase, cookies, anyarch, force, verify))
+        if (!parseSpec(ts, filename, rootdir
+#ifndef RPM_4_4_8
+                     , 0
+#endif
+                     ,0 , passphrase, cookies, anyarch, force
+#ifdef RPM_4_4_8
+                     , verify
+#endif
+                     ))
             spec = rpmtsSetSpec(ts, NULL);
 #ifdef HHACK
     } else {
