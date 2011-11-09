@@ -66,6 +66,9 @@
 
 #include "rpmversion.h"
 
+#ifdef RPM4_9_0
+#include <rpm/rpmspec.h>
+#endif
 #include <rpm/header.h>
 #include <rpm/rpmio.h>
 #include <rpm/rpmdb.h>
@@ -95,6 +98,10 @@
 static unsigned char header_magic[8] = {
     0x8e, 0xad, 0xe8, 0x01, 0x00, 0x00, 0x00, 0x00
 };
+
+#ifdef RPM4_9_0
+typedef struct Package_s * Package;
+#endif
 
 #define CHECK_RPMDS_IX(dep) if (rpmdsIx((dep)) < 0) croak("You call RPM4::Header::Dependencies method after lastest next() of before init()")
 
@@ -406,11 +413,15 @@ void _newspec(rpmts ts, char * filename, SV * svpassphrase, SV * svrootdir, SV *
 	verify = SvIV(svverify);
     
     if (filename) {
+#ifdef RPM4_9_0
+        spec = rpmSpecParse(filename, RPMSPEC_ANYARCH|RPMSPEC_FORCE, NULL);
+#else
         if (!parseSpec(ts, filename, rootdir
 		       , NULL
 		       ,0, passphrase, cookies, anyarch, force
 		       ))
             spec = rpmtsSetSpec(ts, NULL);
+#endif
 #ifdef HHACK
     } else {
         spec = newSpec();
@@ -431,7 +442,11 @@ void _newspec(rpmts ts, char * filename, SV * svpassphrase, SV * svrootdir, SV *
 int _specbuild(rpmts ts, rpmSpec spec, SV * sv_buildflags) {
     rpmBuildFlags buildflags = sv2rpmbuildflags(sv_buildflags);
     if (buildflags == RPMBUILD_NONE) croak("No action given for build");
+#ifdef RPM4_9_0
+    return rpmSpecBuild(spec, buildflags);
+#else
     return buildSpec(ts, spec, buildflags, 0);
+#endif
 }
 
 void _installsrpms(rpmts ts, char * filename) {
@@ -749,7 +764,26 @@ void
 buildhost()
     PREINIT:
     PPCODE:
+#ifdef RPM4_9_0
+    //croak("buildhost exists only in rpm < 4.9");
+    static char hostname[1024];
+    static int oneshot = 0;
+    struct hostent *hbn;
+    
+    if (! oneshot) {
+        (void) gethostname(hostname, sizeof(hostname));
+       hbn = gethostbyname(hostname);
+       if (hbn)
+           strcpy(hostname, hbn->h_name);
+       else
+           rpmlog(RPMLOG_WARNING,
+                       _("Could not canonicalize hostname: %s\n"), hostname);
+       oneshot = 1;
+    }
+    XPUSHs(sv_2mortal(newSVpv(hostname,0)));
+#else
     XPUSHs(sv_2mortal(newSVpv(buildHost(),0)));
+#endif
     
 # Dump to file functions:
 void
@@ -1361,8 +1395,10 @@ rpmdbrebuild(rootdir = NULL)
     PREINIT:
     rpmts ts = rpmtsCreate();
     CODE:
-    if (rootdir)
+    if (!rootdir) rootdir="/";
+    if (rootdir) {
         rpmtsSetRootDir(ts, rootdir);
+    }
     /* 0 on success */
     RETVAL = rpmtsRebuildDB(ts);
     ts = rpmtsFree(ts);
@@ -1471,8 +1507,12 @@ Ts_injectheader(db, header)
     PREINIT:
     rpmdb rdb;
     CODE:
+#ifdef RPM4_9_0
+    croak("injectheader>rpmdbAdd exists only in rpm < 4.9");
+#else
     rdb = rpmtsGetRdb(db);
     RETVAL = rpmdbAdd(rdb, 0, header, db, NULL);
+#endif
     OUTPUT:
     RETVAL
 
@@ -1486,9 +1526,14 @@ Ts_deleteheader(db, sv_offset)
     CODE:
     offset = SvUV(sv_offset);
     rdb = rpmtsGetRdb(db);
-    if (offset)
+    if (offset) {
+#ifdef RPM4_9_0
+        croak("injectheader>rpmdbAdd exists only in rpm < 4.9");
+        RETVAL = 0;
+#else
         RETVAL = rpmdbRemove(rdb, 0, offset, db, NULL);
-    else
+#endif
+   } else
         RETVAL = 1;
     OUTPUT:
     RETVAL
@@ -1515,7 +1560,14 @@ Ts_traverse(ts, callback = NULL, sv_tagname = NULL, sv_tagvalue = NULL, keylen =
 #ifdef HDLISTDEBUG
     PRINTF_CALL;
 #endif
+#ifdef RPM4_9_0
+    croak("traverse is no more supported with rpm 4.9");
+#else
+#ifdef RPM4_9_0
+    ts = rpmtsLink(ts);
+#else
     ts = rpmtsLink(ts, "RPM4 Db::traverse()");
+#endif
     if (sv_tagname == NULL || !SvOK(sv_tagname)) {
         tag = RPMDBI_PACKAGES; /* Assume search into installed packages */
     } else {
@@ -1544,7 +1596,11 @@ Ts_traverse(ts, callback = NULL, sv_tagname = NULL, sv_tagvalue = NULL, keylen =
                 SV **isv = av_fetch(av_exclude, i, 0);
                 exclude[i] = SvUV(*isv);
             }
+#ifdef RPM4_9_0
+            rpmtsPrunedIterator(ts, exclude, av_len(av_exclude) + 1);
+#else
             rpmdbPruneIterator(mi, exclude, av_len(av_exclude) + 1, 0);
+#endif
         }
         while (rc && ((header = rpmdbNextIterator(mi)) != NULL)) {
             RETVAL++;
@@ -1575,6 +1631,7 @@ Ts_traverse(ts, callback = NULL, sv_tagname = NULL, sv_tagvalue = NULL, keylen =
     } else
         RETVAL = -1;
     ts = rpmtsFree(ts);
+#endif
     OUTPUT:
     RETVAL
 
@@ -1716,7 +1773,11 @@ Ts_traverse_transaction(ts, callback, type = 0)
     rpmtsi pi;
     rpmte  Te;
     CODE:
+#ifdef RPM4_9_0
+    ts = rpmtsLink(ts);
+#else
     ts = rpmtsLink(ts, "RPM4 Db::traverse_transaction()");
+#endif
     pi = rpmtsiInit(ts);
     RETVAL = 0;
     while ((Te = rpmtsiNext(pi, type)) != NULL) {
@@ -1773,7 +1834,11 @@ Ts_transrun(ts, callback, ...)
     rpmInstallFlags install_flags = INSTALL_NONE;
     rpmps ps;
     CODE:
+#ifdef RPM4_9_0
+    ts = rpmtsLink(ts);
+#else
     ts = rpmtsLink(ts, "RPM4 Db::transrun()");
+#endif
     if (!SvOK(callback)) { /* undef value */
         rpmtsSetNotifyCallback(ts,
                 rpmShowProgress,
@@ -2633,7 +2698,11 @@ Spec_new(perlclass, specfile = NULL, ...)
             i++;
             if (sv_isobject(ST(i)) && (SvTYPE(SvRV(ST(i))) == SVt_PVMG)) {
                 ts = (rpmts)SvIV((SV*)SvRV(ST(i)));
+#ifdef RPM4_9_0
+                ts = rpmtsLink(ts);  
+#else
                 ts = rpmtsLink(ts, bless_spec);  
+#endif
             } else {
                 croak( "transaction is not a blessed SV reference" );
                 XSRETURN_UNDEF;
@@ -2672,15 +2741,24 @@ Spec_DESTROY(spec)
 #ifdef HDRPMMEM
     PRINTF_FREE(bless_spec, spec, -1);
 #endif
+#ifdef RPM4_9_0
+    rpmSpecFree(spec);
+#else
     freeSpec(spec);
+#endif
 
 void
 Spec_srcheader(spec)
     rpmSpec spec
     PPCODE:
+#ifdef RPM4_9_0
+    Header header = rpmSpecSourceHeader(spec);
+    XPUSHs(sv_2mortal(sv_setref_pv(newSVpv("", 0), bless_header, (void *)headerLink(header))));
+#else
     if ( ! spec->sourceHeader) 
         initSourceHeader(spec);
     XPUSHs(sv_2mortal(sv_setref_pv(newSVpv("", 0), bless_header, (void *)headerLink(spec->sourceHeader))));
+#endif
 
 void
 Spec_binheader(spec)
@@ -2688,8 +2766,19 @@ Spec_binheader(spec)
     PREINIT:
     Package pkg;
     PPCODE:
+#ifdef RPM4_9_0
+/* we could use something like:
+	rpmSpecPkgIter iter = rpmSpecPkgIterInit(spec);
+        while ((pkg = rpmSpecPkgIterNext(iter)) != NULL)
+		(...)
+
+  but it's unused...
+*/
+    croak("binheader is no more supported with rpm 4.9");
+#else
     for (pkg = spec->packages; pkg != NULL; pkg = pkg->next)
         XPUSHs(sv_2mortal(sv_setref_pv(newSVpv("", 0), bless_header, (void *)headerLink(pkg->header))));
+#endif
     
 void
 Spec_srcrpm(spec)
@@ -2697,6 +2786,9 @@ Spec_srcrpm(spec)
     PREINIT:
     const char *name, *version, *release;
     PPCODE:
+#ifdef RPM4_9_0
+    croak("srcrpm is no more supported with rpm 4.9");
+#else   
     (void) headerNVR(spec->packages->header, &name, &version, &release);
     XPUSHs(sv_2mortal(newSVpvf("%s/%s-%s-%s.%ssrc.rpm",
         rpmGetPath("%{_srcrpmdir}", NULL),
@@ -2706,6 +2798,7 @@ Spec_srcrpm(spec)
     headerFreeTag(spec->packages->header, name, RPM_STRING_TYPE);
     headerFreeTag(spec->packages->header, version, RPM_STRING_TYPE);
     headerFreeTag(spec->packages->header, release, RPM_STRING_TYPE);
+#endif
 
 void
 Spec_binrpm(spec)
@@ -2716,6 +2809,9 @@ Spec_binrpm(spec)
     char * binRpm;
     char * path;
     PPCODE:
+#ifdef RPM4_9_0
+    croak("binrpm is no more supported with rpm 4.9");
+#else   
     for(pkg = spec->packages; pkg != NULL; pkg = pkg->next) {
         if (pkg->fileList == NULL)
             continue;
@@ -2728,6 +2824,7 @@ Spec_binrpm(spec)
         free(path);
         free(binRpm);
     }
+#endif
 
 void
 Spec_check(spec, ts = NULL)
@@ -2739,19 +2836,28 @@ Spec_check(spec, ts = NULL)
     PPCODE:
     PUTBACK;
     if (ts)
+#ifdef RPM4_9_0
+        ts = rpmtsLink(ts);
+#else
         ts = rpmtsLink(ts, "Spec_check");
+#endif
     else
         ts = rpmtsCreate();
-
+#ifndef RPM4_9_0
     if ( ! spec->sourceHeader) 
         initSourceHeader(spec);
-
-    if (!headerIsEntry(spec->sourceHeader, RPMTAG_REQUIRENAME)
-     && !headerIsEntry(spec->sourceHeader, RPMTAG_CONFLICTNAME))
+#endif
+#ifdef RPM4_9_0
+    Header header = rpmSpecSourceHeader(spec);
+#else
+    Header header = spec->sourceHeader;
+#endif
+    if (!headerIsEntry(header, RPMTAG_REQUIRENAME)
+     && !headerIsEntry(header, RPMTAG_CONFLICTNAME))
         /* XSRETURN_UNDEF; */
         return;
 
-    (void) rpmtsAddInstallElement(ts, spec->sourceHeader, NULL, 0, NULL);
+    (void) rpmtsAddInstallElement(ts, header, NULL, 0, NULL);
 
     if(rpmtsCheck(ts))
         croak("Can't check rpmts"); /* any better idea ? */
@@ -2779,7 +2885,11 @@ const char *
 Spec_specfile(spec)
     rpmSpec spec
     CODE:
+#ifdef RPM4_9_0
+    croak("specfile exists only in rpm < 4.9");
+#else
     RETVAL = spec->specFile;
+#endif
     OUTPUT:
     RETVAL
         
@@ -2790,11 +2900,15 @@ Spec_sources(spec, is = 0)
     PREINIT:
     struct Source *srcPtr;
     PPCODE:
+#ifdef RPM4_9_0
+    croak("sources exists only in rpm < 4.9");
+#else
     for (srcPtr = spec->sources; srcPtr != NULL; srcPtr = srcPtr->next) {
         if (is && !(srcPtr->flags & is))
             continue;
         XPUSHs(sv_2mortal(newSVpv(srcPtr->source, 0)));
     }
+#endif
 
 void
 Spec_sources_url(spec, is = 0)
@@ -2803,11 +2917,15 @@ Spec_sources_url(spec, is = 0)
     PREINIT:
     struct Source * srcPtr;
     PPCODE:
+#ifdef RPM4_9_0
+//    XPUSHs(sv_2mortal(newSVpv(get_name(pkg->h, RPMTAG_URL), 0)));
+#else
     for (srcPtr = spec->sources; srcPtr != NULL; srcPtr = srcPtr->next) {
         if (is && !(srcPtr->flags & is))
             continue;
         XPUSHs(sv_2mortal(newSVpv(srcPtr->fullSource, 0)));
     }
+#endif
 
 void
 Spec_icon(spec)
@@ -2815,6 +2933,9 @@ Spec_icon(spec)
     PREINIT:
     Package pkg;
     PPCODE:
+#ifdef RPM4_9_0
+    croak("icon exists only in rpm < 4.9");
+#else
     for (pkg = spec->packages; pkg != NULL; pkg = pkg->next) {
         char * dest = NULL;
         int len;
@@ -2825,6 +2946,7 @@ Spec_icon(spec)
         memcpy(dest, pkg->icon->source, len);
         XPUSHs(sv_2mortal(newSVpv(dest, len)));
     }
+#endif
 
 void
 Spec_icon_url(spec)
@@ -2832,6 +2954,9 @@ Spec_icon_url(spec)
     PREINIT:
     Package pkg;
     PPCODE:
+#ifdef RPM4_9_0
+    croak("icon_url exists only in rpm < 4.9");
+#else
     for (pkg = spec->packages; pkg != NULL; pkg = pkg->next) {
         char * dest = NULL;
         int len;
@@ -2842,6 +2967,7 @@ Spec_icon_url(spec)
         memcpy(dest, pkg->icon->fullSource, len);
         XPUSHs(sv_2mortal(newSVpv(dest, len)));
     }
+#endif
 
 MODULE = RPM4		PACKAGE = RPM4::Db::_Problems	PREFIX = ps_
 

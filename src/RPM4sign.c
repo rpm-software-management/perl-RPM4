@@ -9,11 +9,17 @@
 #undef Stat
 
 #include <rpm/rpmcli.h>
+#ifdef RPM4_9_0
+#include <rpm/rpmsign.h>
+#endif
 
 #include "RPM4.h"
 
 /* Hight level function */
 int rpmsign(char *passphrase, const char *rpm) {
+#ifdef RPM4_9_0
+    return rpmPkgSign(rpm, NULL, passphrase);
+#else
     QVA_t qva = &rpmQVKArgs;
     ARGV_t file = NULL;
 
@@ -23,5 +29,6 @@ int rpmsign(char *passphrase, const char *rpm) {
     qva->passPhrase = passphrase;
     
     return rpmcliSign(NULL, qva, file);
+#endif
 }
 
