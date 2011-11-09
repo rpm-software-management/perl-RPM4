@@ -416,10 +416,7 @@ void _newspec(rpmts ts, char * filename, SV * svpassphrase, SV * svrootdir, SV *
 #ifdef RPM4_9_0
         spec = rpmSpecParse(filename, RPMSPEC_ANYARCH|RPMSPEC_FORCE, NULL);
 #else
-        if (!parseSpec(ts, filename, rootdir
-		       , NULL
-		       ,0, passphrase, cookies, anyarch, force
-		       ))
+	if (!parseSpec(ts, filename, rootdir, NULL ,0, passphrase, cookies, anyarch, force))
             spec = rpmtsSetSpec(ts, NULL);
 #endif
 #ifdef HHACK
