@@ -1805,7 +1805,7 @@ Ts_transrun(ts, callback, ...)
     PREINIT:
     int i;
     rpmprobFilterFlags probFilter = RPMPROB_FILTER_NONE;
-    rpmInstallInterfaceFlags install_flags = INSTALL_NONE;
+    rpmInstallFlags install_flags = INSTALL_NONE;
     rpmps ps;
     CODE:
     ts = rpmtsLink(ts, "RPM4 Db::transrun()");
@@ -2031,7 +2031,7 @@ Te_files(Te)
     PREINIT:
     rpmfi Files;
     PPCODE:
-    Files = rpmteFI(Te, RPMTAG_BASENAMES);
+    Files = rpmteFI(Te);
     if ((Files = rpmfiInit(Files, 0)) != NULL && rpmfiNext(Files) >= 0) {
         XPUSHs(sv_2mortal(sv_setref_pv(newSVpv("", 0), bless_rpmfi, Files)));
 #ifdef HDRPMMEM
