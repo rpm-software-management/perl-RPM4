@@ -78,10 +78,14 @@
 #include <rpm/rpmps.h>
 #include <rpm/rpmfi.h>
 #include <rpm/rpmpgp.h>
-#include <rpm/misc.h>
 #include <rpm/rpmbuild.h>
+#include <rpm/rpmfileutil.h>
 #include <rpm/rpmlib.h>
+#include <rpm/rpmlog.h>
 #include <rpm/rpmpgp.h>
+#include <rpm/rpmtag.h>
+#define _RPM_4_4_COMPAT
+#include <rpm/rpmlegacy.h>
 
 #ifdef HAVE_RPMCONSTANT
 #include <rpmconstant/rpmconstant.h>
@@ -189,10 +193,10 @@ void *
 #endif 
     transCallback(const void *h,
        const rpmCallbackType what,
-       const RPM_CALLBACK_AMOUNT_TYPE amount,
-       const RPM_CALLBACK_AMOUNT_TYPE total,
-       const void * pkgKey,
-       void * data) {
+       const rpm_loff_t amount,
+       const rpm_loff_t total,
+       fnpyKey pkgKey,
+       rpmCallbackData data) {
     
     /* The call back is used to open/close file, so we fix value, run the perl callback
      * and let rpmShowProgress from rpm rpmlib doing its job.
@@ -292,7 +296,7 @@ void *
  * is set for for the logging system.
  * If the callback is set, rpm does not print any message,
  * and let the callback to do it */
-void logcallback(void) {
+int logcallback(rpmlogRec rec, rpmlogCallbackData data) {
     dSP;
     if (log_callback_function) {
         int logcode = rpmlogCode();
@@ -304,54 +308,13 @@ void logcallback(void) {
         XPUSHs(sv_2mortal(newSVpv("logcode", 0)));
         XPUSHs(sv_2mortal(newSViv(logcode)));
         XPUSHs(sv_2mortal(newSVpv("msg", 0)));
-        XPUSHs(sv_2mortal(newSVpv(rpmlogMessage(), 0)));
+        XPUSHs(sv_2mortal(newSVpv((char *) rpmlogMessage(), 0)));
         XPUSHs(sv_2mortal(newSVpv("priority", 0)));
         XPUSHs(sv_2mortal(newSViv(RPMLOG_PRI(logcode))));
         PUTBACK;
         call_sv(log_callback_function, G_DISCARD | G_SCALAR);
         SPAGAIN;
     }
-}
-
-/* This callback is run during transcheck */
-int transSolveCallback(rpmts ts, rpmds Dep, const void * data) {
-    int rc = 0;
-    int count;
-    dSP;
-#ifdef HDLISTDEBUG
-    PRINTF_CALL;
-#endif
-    /* Should return -1 retry, 0 ignore, 1 not found */
-    rc = rpmtsSolve(ts, Dep, data);
-    /* PUSHMARK(SP); */
-    if (ts) {
-    XPUSHs(sv_2mortal(newSVpv("db", 0)));
-    XPUSHs(sv_2mortal(sv_setref_pv(newSVpv("", 0), bless_rpmts, rpmtsLink(ts, "RPM4 transSolveCallback()"))));
-#ifdef HDRPMMEM
-    PRINTF_NEW(bless_rpmts, ts, ts->nrefs);
-#endif
-
-    }
-    if (Dep) {
-    XPUSHs(sv_2mortal(newSVpv("dep", 0)));
-    XPUSHs(sv_2mortal(sv_setref_pv(newSVpv("", 0), bless_rpmds, rpmdsLink(Dep, "RPM4 transSolveCallback()"))));
-#ifdef HDRPMMEM
-    PRINTF_NEW(bless_rpmds, Dep, Dep->nrefs);
-#endif
-    }
-    XPUSHs(sv_2mortal(newSVpv("rc", 0)));
-    XPUSHs(sv_2mortal(newSViv(rc)));
-    PUTBACK;
-    count = call_sv((SV *) data, G_SCALAR);
-    SPAGAIN;
-    if (count) {
-        rc = POPi;
-        if (rc < -1 || rc > 1)
-            croak("Uh Oh! Your perl callback should return 1 (retry), 0 (ignore) or 1 (not found) and not %d", rc);
-    } else {
-        rc = 1;
-    }
-    return rc;
 }
 
 /**************************************************
@@ -416,7 +379,7 @@ void _newdep(SV * sv_deptag, char * name, SV * sv_sense, SV * sv_evr) {
 
 /* Get a new specfile */
 void _newspec(rpmts ts, char * filename, SV * svpassphrase, SV * svrootdir, SV * svcookies, SV * svanyarch, SV * svforce, SV * svverify) {
-    Spec spec = NULL;
+    rpmSpec spec = NULL;
     char * passphrase = NULL;
     char * rootdir = NULL;
     char * cookies = NULL;
@@ -447,14 +410,14 @@ void _newspec(rpmts ts, char * filename, SV * svpassphrase, SV * svrootdir, SV *
     
     if (filename) {
         if (!parseSpec(ts, filename, rootdir
-#ifndef RPM_4_4_8
-                     , 0
+#ifndef RPM4_4_8
+		       , NULL
 #endif
-                     ,0 , passphrase, cookies, anyarch, force
-#ifdef RPM_4_4_8
-                     , verify
+		       ,0, passphrase, cookies, anyarch, force
+#ifdef RPM4_4_8
+		       , verify
 #endif
-                     ))
+		       ))
             spec = rpmtsSetSpec(ts, NULL);
 #ifdef HHACK
     } else {
@@ -473,15 +436,15 @@ void _newspec(rpmts ts, char * filename, SV * svpassphrase, SV * svrootdir, SV *
 }
 
 /* Building a spec file */
-int _specbuild(rpmts ts, Spec spec, SV * sv_buildflags) {
+int _specbuild(rpmts ts, rpmSpec spec, SV * sv_buildflags) {
     rpmBuildFlags buildflags = sv2rpmbuildflags(sv_buildflags);
     if (buildflags == RPMBUILD_NONE) croak("No action given for build");
     return buildSpec(ts, spec, buildflags, 0);
 }
 
 void _installsrpms(rpmts ts, char * filename) {
-    const char * specfile = NULL;
-    const char * cookies = NULL;
+    char * specfile = NULL;
+    char * cookies = NULL;
     dSP;
     I32 gimme = GIMME_V;
     if (rpmInstallSource(
@@ -522,9 +485,9 @@ BOOT:
 if (rpmReadConfigFiles(NULL, NULL) != 0)
     croak("Can't read configuration");
 #ifdef HDLISTDEBUG
-rpmSetVerbosity(RPMMESS_DEBUG);
+rpmSetVerbosity(RPMLOG_DEBUG);
 #else
-rpmSetVerbosity(RPMMESS_NORMAL);
+rpmSetVerbosity(RPMLOG_NOTICE);
 #endif
 #ifdef HDRPMDEBUG
 _rpmds_debug = -1;
@@ -580,10 +543,10 @@ setlogcallback(function)
     SV * function
     CODE:
     if (function == NULL || !SvOK(function)) {
-        rpmlogSetCallback(NULL);
+        rpmlogSetCallback(NULL, NULL);
     } else if (SvTYPE(SvRV(function)) == SVt_PVCV) {
         log_callback_function = newSVsv(function);
-        rpmlogSetCallback(logcallback);
+        rpmlogSetCallback(logcallback, NULL);
     } else
         croak("First arg is not a code reference");
 
@@ -591,7 +554,7 @@ void
 lastlogmsg()
     PPCODE:
     XPUSHs(sv_2mortal(newSViv(rpmlogCode())));
-    XPUSHs(sv_2mortal(newSVpv(rpmlogMessage(), 0)));
+    XPUSHs(sv_2mortal(newSVpv((char *) rpmlogMessage(), 0)));
 
 int
 setlogfile(filename)
@@ -617,7 +580,7 @@ readconfig(rcfile = NULL, target = NULL)
     char * rcfile
     char * target
     CODE:
-    RETVAL = rpmReadConfigFiles(rcfile, target);
+    RETVAL = rpmReadConfigFiles(rcfile && rcfile[0] ? rcfile : NULL, target);
     OUTPUT:
     RETVAL
 
@@ -634,29 +597,7 @@ rpmlog(svcode, msg)
 void
 querytag()
     PREINIT:
-    int i = 0;
-    const struct headerSprintfExtension_s * ext = rpmHeaderFormats;
-    PPCODE:
-    for (i = 0; i < rpmTagTableSize; i++) {
-	     XPUSHs(sv_2mortal(newSVpv(rpmTagTable[i].name + 7, 0)));
-	     XPUSHs(sv_2mortal(newSViv(rpmTagTable[i].val)));
-    }
-
-    while (ext->name != NULL) {
-	    if (ext->type == HEADER_EXT_MORE) {
-	        ext = ext->u.more;
-	        continue;
-	    }
-	    for (i = 0; i < rpmTagTableSize; i++) {
-	        if (!strcmp(rpmTagTable[i].name, ext->name))
-	    	    break;
-	    }
-	    if (i >= rpmTagTableSize && ext->type == HEADER_EXT_TAG) {
-	    	XPUSHs(sv_2mortal(newSVpv(ext->name + 7, 0)));
-	        XPUSHs(sv_newmortal());
-	    }
-	    ext++;
-    }
+    CODE:
 
 int
 tagtypevalue(svtagtype)
@@ -680,7 +621,7 @@ tagName(tag)
     PREINIT:
     const char *r  = NULL;
     PPCODE:
-    r = tagName(tag);
+    r = rpmTagGetName(tag);
     XPUSHs(sv_2mortal(newSVpv(r, 0)));
 
 void
@@ -725,7 +666,7 @@ expand(name)
     PPCODE:
     const char * value = rpmExpand(name, NULL);
     XPUSHs(sv_2mortal(newSVpv(value, 0)));
-    free(value);
+    free((char *) value);
 
 void
 expandnumeric(name)
@@ -1213,10 +1154,10 @@ Header_queryformat(h, query)
     PREINIT:
     char *s = NULL;
     PPCODE:
-    s = headerSprintf(h, query,
-            rpmTagTable, rpmHeaderFormats, NULL);
+    s = headerFormat(h, query,
+            NULL);
     XPUSHs(sv_2mortal(newSVpv(s, 0)));
-    _free(s);
+    free(s);
 
 void
 Header_fullname(h)
@@ -1262,7 +1203,7 @@ void
 Header_nevr(header)
     Header header
     PPCODE:
-    PUSHs(sv_2mortal(newSVpv(hGetNEVR(header, NULL), 0)));
+    PUSHs(sv_2mortal(newSVpv(headerGetNEVR(header, NULL), 0)));
     
 int
 Header_issrc(h)
@@ -1694,7 +1635,7 @@ Ts_transadd(ts, header, key = NULL, upgrade = 1, sv_relocation = NULL, force = 0
 /*        if (! (headerGetEntry(eiu->h, RPMTAG_PREFIXES, &pft,
                        (void **) &paths, &c) && (c == 1))) { */
         if (! headerIsEntry(header, RPMTAG_PREFIXES)) {
-            rpmMessage(RPMMESS_ERROR,
+            rpmMessage(RPMLOG_ERR,
                    _("package %s is not relocatable\n"), "");
             XPUSHi((IV)1);
             XSRETURN(1);
@@ -1836,22 +1777,10 @@ Ts_traverse_transaction(ts, callback, type = 0)
     RETVAL
         
 int
-Ts_transcheck(ts, callback = NULL)
+Ts_transcheck(ts)
     rpmts ts
-    SV * callback
     CODE:
-    ts = rpmtsLink(ts, "RPM4 Db_transcheck()");
-    if (callback != NULL && SvOK(callback) && SvTYPE(SvRV(callback)) == SVt_PVCV) { /* Be sure we have a code ref */
-#ifdef HDLISTDEBUG
-        PRINTF_CALL;
-#endif
-        rpmtsSetSolveCallback(ts, transSolveCallback, (void *) callback);
-    }
-    
     RETVAL = rpmtsCheck(ts);
-    /* Restoring default rpm setting */
-    rpmtsSetSolveCallback(ts, rpmtsSolve, NULL);
-    ts = rpmtsFree(ts);
     OUTPUT:
     RETVAL
 
@@ -1916,7 +1845,7 @@ Ts__transpbs(ts)
     rpmps ps;
     PPCODE:
     ps = rpmtsProblems(ts);
-    if (ps &&  ps->numProblems) /* if no problem, return undef */
+    if (ps && rpmpsNumProblems(ps)) /* if no problem, return undef */
         XPUSHs(sv_2mortal(sv_setref_pv(newSVpv("", 0), bless_rpmps, ps)));
     
 int
@@ -1924,22 +1853,22 @@ Ts_importpubkey(ts, filename)
     rpmts ts
     char * filename
     PREINIT:
-    const byte * pkt = NULL;
+    uint8_t *pkt = NULL;
     size_t pktlen = 0;
     int rc;
     CODE:
     rpmtsClean(ts);
     
-    if ((rc = pgpReadPkts(filename, &pkt, &pktlen)) <= 0) {
+    if ((rc = pgpReadPkts(filename, (uint8_t ** ) &pkt, &pktlen)) <= 0) {
         RETVAL = 1;
     } else if (rc != PGPARMOR_PUBKEY) {
         RETVAL = 1;
-    } else if (rpmcliImportPubkey(ts, pkt, pktlen) != RPMRC_OK) {
+    } else if (rpmtsImportPubkey(ts, pkt, pktlen) != RPMRC_OK) {
         RETVAL = 1;
     } else {
         RETVAL = 0;
     }
-    pkt = _free(pkt);
+    free(pkt);
     OUTPUT:
     RETVAL
    
@@ -1984,7 +1913,7 @@ Ts_rpm2header(ts, filename)
 int
 Ts_specbuild(ts, spec, sv_buildflags)
     rpmts ts
-    Spec spec
+    rpmSpec spec
     SV * sv_buildflags
     CODE:
     RETVAL = _specbuild(ts, spec, sv_buildflags);
@@ -2137,7 +2066,7 @@ rpmlibdep()
     int i;
 #endif
     PPCODE:
-#ifndef RPM4_4_3
+#if 0
     num = rpmGetRpmlibProvides(&provNames, &provFlags, &provVersions);
     for (i = 0; i < num; i++) {
 #ifdef HDLISTDEBUG
@@ -2624,20 +2553,13 @@ void
 Files_md5(Files)
     rpmfi Files
     PREINIT:
-    const byte * md5;
-    char * fmd5 = malloc((char) 33);
+    const char * md5;
     PPCODE:
     if ((md5 = 
-#ifdef RPM4_4_6
-        rpmfiDigest(Files, NULL, NULL)
-#else
-        rpmfiMD5(Files)
-#endif
+        rpmfiFDigestHex(Files, NULL)
             ) != NULL && *md5 != 0 /* return undef if empty */) {
-        (void) pgpHexCvt(fmd5, md5, 16);
-        XPUSHs(sv_2mortal(newSVpv(fmd5, 0)));
+        XPUSHs(sv_2mortal(newSVpv(md5, 0)));
     }
-    _free(fmd5);
 
 void
 Files_link(Files)
@@ -2780,7 +2702,7 @@ Spec_new(perlclass, specfile = NULL, ...)
     
 void
 Spec_DESTROY(spec)
-    Spec spec
+    rpmSpec spec
     CODE:
 #ifdef HDRPMMEM
     PRINTF_FREE(bless_spec, spec, -1);
@@ -2789,7 +2711,7 @@ Spec_DESTROY(spec)
 
 void
 Spec_srcheader(spec)
-    Spec spec
+    rpmSpec spec
     PPCODE:
     if ( ! spec->sourceHeader) 
         initSourceHeader(spec);
@@ -2797,7 +2719,7 @@ Spec_srcheader(spec)
 
 void
 Spec_binheader(spec)
-    Spec spec
+    rpmSpec spec
     PREINIT:
     Package pkg;
     PPCODE:
@@ -2806,7 +2728,7 @@ Spec_binheader(spec)
     
 void
 Spec_srcrpm(spec)
-    Spec spec
+    rpmSpec spec
     PREINIT:
     const char *name, *version, *release;
     PPCODE:
@@ -2822,10 +2744,10 @@ Spec_srcrpm(spec)
 
 void
 Spec_binrpm(spec)
-    Spec spec
+    rpmSpec spec
     PREINIT:
     Package pkg;
-    const char * binFormat;
+    char * binFormat;
     char * binRpm;
     char * path;
     PPCODE:
@@ -2834,18 +2756,17 @@ Spec_binrpm(spec)
             continue;
         /* headerCopyTags(h, pkg->header, copyTags); */
         binFormat = rpmGetPath("%{_rpmfilename}", NULL);
-        binRpm = headerSprintf(pkg->header, binFormat, rpmTagTable,
-                   rpmHeaderFormats, NULL);
-        _free(binFormat);
+        binRpm = headerFormat(pkg->header, binFormat, NULL);
+        free(binFormat);
         path = rpmGetPath("%{_rpmdir}/", binRpm, NULL);
         XPUSHs(sv_2mortal(newSVpv(path, 0)));
-        _free(path);
-        _free(binRpm);
+        free(path);
+        free(binRpm);
     }
 
 void
 Spec_check(spec, ts = NULL)
-    Spec spec
+    rpmSpec spec
     PREINIT:
     int rc;
     rpmts ts = rpmtsCreate();
@@ -2871,7 +2792,7 @@ Spec_check(spec, ts = NULL)
         croak("Can't check rpmts"); /* any better idea ? */
 
     ps = rpmtsProblems(ts);
-    if (ps &&  ps->numProblems) /* if no problem, return undef */
+    if (ps && rpmpsNumProblems(ps)) /* if no problem, return undef */
         XPUSHs(sv_2mortal(sv_setref_pv(newSVpv("", 0), bless_rpmps, ps)));
     ts = rpmtsFree(ts);
     SPAGAIN;
@@ -2879,7 +2800,7 @@ Spec_check(spec, ts = NULL)
     
 int
 Spec_build(spec, sv_buildflags)
-    Spec spec
+    rpmSpec spec
     SV * sv_buildflags
     PREINIT:
     rpmts ts = rpmtsCreate();
@@ -2891,7 +2812,7 @@ Spec_build(spec, sv_buildflags)
 
 const char *
 Spec_specfile(spec)
-    Spec spec
+    rpmSpec spec
     CODE:
     RETVAL = spec->specFile;
     OUTPUT:
@@ -2899,7 +2820,7 @@ Spec_specfile(spec)
         
 void
 Spec_sources(spec, is = 0)
-    Spec spec
+    rpmSpec spec
     int is
     PREINIT:
     struct Source *srcPtr;
@@ -2912,7 +2833,7 @@ Spec_sources(spec, is = 0)
 
 void
 Spec_sources_url(spec, is = 0)
-    Spec spec
+    rpmSpec spec
     int is
     PREINIT:
     struct Source * srcPtr;
@@ -2925,7 +2846,7 @@ Spec_sources_url(spec, is = 0)
 
 void
 Spec_icon(spec)
-    Spec spec
+    rpmSpec spec
     PREINIT:
     Package pkg;
     PPCODE:
@@ -2942,7 +2863,7 @@ Spec_icon(spec)
 
 void
 Spec_icon_url(spec)
-    Spec spec
+    rpmSpec spec
     PREINIT:
     Package pkg;
     PPCODE:
@@ -2967,7 +2888,7 @@ ps_new(perlclass, ts)
     rpmps ps;
     PPCODE:
     ps = rpmtsProblems(ts);
-    if (ps &&  ps->numProblems) /* if no problem, return undef */
+    if (ps && rpmpsNumProblems(ps)) /* if no problem, return undef */
         XPUSHs(sv_2mortal(sv_setref_pv(newSVpv("", 0), bless_rpmps, ps)));
  
 void
@@ -2997,13 +2918,9 @@ ps_isignore(ps, numpb)
     int numpb
     PREINIT:
     rpmProblem p;
+    int i;
     CODE:
-    if (ps->numProblems < numpb)
-        RETVAL = 0; /* croak here ? */
-    else {
-        p = ps->probs + numpb;
-        RETVAL = p->ignoreProblem;
-    }
+    RETVAL = 0; /* ignoreProblem is obsolete and always false */
     OUTPUT:
     RETVAL
 
@@ -3013,12 +2930,17 @@ ps_fmtpb(ps, numpb)
     int numpb
     PREINIT:
     rpmProblem p;
+    int i;
     CODE:
-    if (ps->numProblems < numpb)
-        RETVAL = NULL;
-    else {
-        p = ps->probs + numpb;
+    rpmpsi psi = rpmpsInitIterator(ps);
+    for (i = 0; i <= numpb; i++)
+      if (rpmpsNextIterator(psi) < 0) break;
+
+    p = rpmpsGetProblem(psi);
+    if (p)
         RETVAL = rpmProblemString(p);
+    else {
+        RETVAL = NULL;
     }
     OUTPUT:
     RETVAL

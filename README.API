@@ -1,0 +1,65 @@
+The following packages require perl-RPM4:
+
+(1) iurt
+(2) perl-MDV-Repsys
+(3) perl-Youri-Package-RPM-Builder
+(4) perl-Youri-Package-RPM-Updater
+(5) perl-Youri-Package
+(6) mdv-youri-core
+
+notes:
+- (5) doesn't use proposes both Youri::Package::URPM and
+Youri::Package::RPM4, and doesn't force usage of any.
+- (6) is a fork of perl-Youri-Package, which uses Youri::Package::URPM
+(and so perl-RPM4 is unused)
+
+here is below the various functions/methods of perl-RPM4 used by the
+packages above.
+
+RPM4::add_macro (2)(3)(4)
+RPM4::expand (2)(3)(4) [renamed expand_macro in rpm5]
+RPM4::installsrpm (2)(4)
+RPM4::rpmvercmp (4)
+RPM4::setverbosity (2)(4)
+RPM4::Sign->new
+  $sign->rpmssign [not available in rpm5]
+RPM4::Transaction->new
+  $db->transadd (3) [renamed add_install in rpm5]
+  $db->transcheck (3) [renamed check in rpm5]
+  $db->transpbs (3) [renamed problems in rpm5]
+    $pbs->hasnext (3) [not available directly in rpm5]
+    $pbs->init (3) [not available directly in rpm5]
+    $pbs->problem (3) [not available directly in rpm5]
+RPM4::Spec->new
+  $spec->binrpm (3)
+  $spec->sources (2)
+  $spec->sources_url (4)
+  $spec->srcheader (2)(3)(4)
+  $spec->srcrpm (3)
+RPM4::Header->new
+  $header->compare
+  $header->dep [renamed dependencies in rpm5]
+    $deps->info [not available directly in rpm5]
+    $deps->init
+    $deps->next
+  $header->files
+    $files->filename
+    $files->init
+    $files->md5 [renamed digest in rpm5]
+    $files->mode
+    $files->next
+  $header->fullname [not available directly in rpm5]
+  $header->issrc [renamed is_source_package in rpm5]
+  $header->queryformat (1)(2) [renamed tagformat in rpm5]
+  $header->sourcerpmname [not available directly in rpm5]
+  $header->tag (4)
+RPM4::Header::Dependencies->new [renamed RPM::Dependencies in rpm5]
+  $dep->overlap
+
+nb:
+- functions/methods above which are not used by (1), (2), (3), (4) are
+used by either (5) or (6) (usually by both)
+- i have annotated with [... in rpm5] the changes between perl-RPM4
+and RPM perl module in rpm5 CVS
+- except for ->rpmsign, the "not available in rpm5" have similar
+functions in rpm5 RPM module

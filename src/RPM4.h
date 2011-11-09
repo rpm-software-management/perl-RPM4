@@ -16,15 +16,6 @@ int rpmchecksig(rpmts ts, const char * filename, int flags);
  * We Import its here 
  * This File should be the last included */
 
-/* From rpmlead.h */
-
-#ifndef _H_RPMLEAD
-
-rpmRC writeLead(FD_t fd, const struct rpmlead *lead);
-rpmRC readLead(FD_t fd, struct rpmlead *lead);
-
-#endif /* _H_RPMLEAD */
-
 /* From signature.h */
 
 #ifndef H_SIGNATURE
@@ -48,7 +39,7 @@ rpmRC rpmReadSignature(FD_t fd, Header *sighp,
 int rpmWriteSignature(FD_t fd, Header h);
 
 int rpmAddSignature(Header sig, const char * file,
-		    int_32 sigTag, const char * passPhrase);
+		    int32_t sigTag, const char * passPhrase);
 
 #define RPMLOOKUPSIG_QUERY	0	/*!< Lookup type in effect          */
 #define RPMLOOKUPSIG_DISABLE	1	/*!< Disable (--sign was not given) */
@@ -71,10 +62,10 @@ const char * rpmDetectPGPVersion(pgpVersion * pgpVer);
  */
 typedef /*@abstract@*/ struct entryInfo_s * entryInfo;
 struct entryInfo_s {
-    int_32 tag;         /*!< Tag identifier. */
-    int_32 type;        /*!< Tag data type. */
-    int_32 offset;      /*!< Offset into data segment (ondisk only). */
-    int_32 count;       /*!< Number of tag elements. */
+    int32_t tag;         /*!< Tag identifier. */
+    int32_t type;        /*!< Tag data type. */
+    int32_t offset;      /*!< Offset into data segment (ondisk only). */
+    int32_t count;       /*!< Number of tag elements. */
 };
 
 /** \ingroup header

@@ -33,12 +33,6 @@ foreach (qw(
     4.2.0
     4.4.1
     4.4.2
-    4.4.3
-    4.4.4
-    4.4.5
-    4.4.6
-    4.4.7
-    4.4.8
     )) {
     $v = $_;
     $v =~ s/\./_/g;
@@ -89,7 +83,7 @@ WriteMakefile(
     VERSION_FROM => '../lib/RPM4.pm',
     OBJECT       => "RPM4.o RPM4sign.o $obj",
     INC	         => "-I$rpmheaderlocation",
-    LIBS         => "-lrpm -lrpmio -lrpmdb -lrpmbuild -lpopt -lz -lbz2 $ldd",
-    'CCFLAGS'    => $fl,
+    LIBS         => "-lrpm -lrpmio -lrpmbuild -lpopt -lz -lbz2 $ldd",
+    'CCFLAGS'    => "-Wall $fl",
     depend       => { "RPM4.xs" => join(" ", @rpmconstantfiles) },
 );

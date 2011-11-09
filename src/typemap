@@ -1,6 +1,6 @@
 TYPEMAP
 Header                  O_OBJECT
-Spec                    O_OBJECT
+rpmSpec                 O_OBJECT
 rpmts                   O_OBJECT
 rpmds                   O_OBJECT
 rpmfi                   O_OBJECT

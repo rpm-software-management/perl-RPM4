@@ -15,10 +15,9 @@
 /* Hight level function */
 int rpmsign(char *passphrase, const char *rpm) {
     QVA_t qva = &rpmQVKArgs;
-    const char * file[2];
+    ARGV_t file = NULL;
 
-    file[0] = rpm;
-    file[1] = NULL;
+    argvAdd(&file, rpm);
 
     qva->qva_mode = RPMSIGN_ADD_SIGNATURE;
     qva->passPhrase = passphrase;
