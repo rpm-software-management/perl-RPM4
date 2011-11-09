@@ -65,9 +65,6 @@
 #endif
 
 #include "rpmversion.h"
-#ifdef RPM4_4_6
-    #define _RPMPS_INTERNAL
-#endif
 
 #include <rpm/header.h>
 #include <rpm/rpmio.h>
@@ -410,13 +407,8 @@ void _newspec(rpmts ts, char * filename, SV * svpassphrase, SV * svrootdir, SV *
     
     if (filename) {
         if (!parseSpec(ts, filename, rootdir
-#ifndef RPM4_4_8
 		       , NULL
-#endif
 		       ,0, passphrase, cookies, anyarch, force
-#ifdef RPM4_4_8
-		       , verify
-#endif
 		       ))
             spec = rpmtsSetSpec(ts, NULL);
 #ifdef HHACK
@@ -748,12 +740,8 @@ platformscore(platform)
     const char * platform
     PREINIT:
     CODE:
-#ifdef RPM4_4_8
-    RETVAL=rpmPlatformScore(platform, NULL, 0);
-#else
     RETVAL=0;
     croak("platformscore exists only from rpm 4.4.8");
-#endif
     OUTPUT:
     RETVAL
 
@@ -1617,9 +1605,6 @@ Ts_transadd(ts, header, key = NULL, upgrade = 1, sv_relocation = NULL, force = 0
     int force
     PREINIT:
     rpmRelocation * relocations = NULL;
-#ifdef RPM4_4_6
-    rpmRelocation relptr = NULL;
-#endif
     HV * hv_relocation;
     HE * he_relocation;
     int i = 0;
@@ -1643,42 +1628,22 @@ Ts_transadd(ts, header, key = NULL, upgrade = 1, sv_relocation = NULL, force = 0
         if (SvTYPE(sv_relocation) == SVt_PV) {
             /* String value, assume a prefix */
             relocations = malloc(2 * sizeof(*relocations));
-#ifdef RPM4_4_6
-            relptr = relocations[0];
-            relptr->newPath = SvPV_nolen(sv_relocation);
-            relptr = relocations[1];
-            relptr->oldPath = relptr->newPath = NULL;
-#else
             relocations[0].oldPath = NULL;
             relocations[0].newPath = SvPV_nolen(sv_relocation);
             relocations[1].oldPath = relocations[1].newPath = NULL;
-#endif
         } else if (SvTYPE(SvRV(sv_relocation)) == SVt_PVHV) {
             hv_relocation = (HV*)SvRV(sv_relocation);
             hv_iterinit(hv_relocation);
             while ((he_relocation = hv_iternext(hv_relocation)) != NULL) {
                 relocations = realloc(relocations, sizeof(*relocations) * (++i));
-#ifdef RPM4_4_6
-                relptr = relocations[i-1];
-                relptr->oldPath = NULL;
-                relptr->newPath = NULL;
-                relptr->oldPath = hv_iterkey(he_relocation, &len);
-                relptr->newPath = SvPV_nolen(hv_iterval(hv_relocation, he_relocation));
-#else
                 relocations[i-1].oldPath = NULL;
                 relocations[i-1].newPath = NULL;
                 relocations[i-1].oldPath = hv_iterkey(he_relocation, &len);
                 relocations[i-1].newPath = SvPV_nolen(hv_iterval(hv_relocation, he_relocation));
-#endif
             }
             /* latest relocation is identify by NULL setting */
             relocations = realloc(relocations, sizeof(*relocations) * (++i));
-#ifdef RPM4_4_6
-            relptr = relocations[i-1];
-            relptr->oldPath = relptr->newPath = NULL;
-#else 
             relocations[i-1].oldPath = relocations[i-1].newPath = NULL;
-#endif
         } else {
             croak("latest argument is set but is not an array ref or a string");
         }

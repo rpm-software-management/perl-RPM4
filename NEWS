@@ -1,2 +1,3 @@
 - add rpm-4.6 support (pixel, 2009-01-20)
 - add rpm-4.8 support (Dexter Morgan, 2011-02)
+- drop support for rpm-4.4.x (spaghetti...)
