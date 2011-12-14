@@ -753,7 +753,7 @@ platformscore(platform)
     PREINIT:
     CODE:
     RETVAL=0;
-    croak("platformscore exists only from rpm 4.4.8");
+    croak("platformscore exists only from rpm 4.4.8; unused anyway");
     OUTPUT:
     RETVAL
 
@@ -1504,7 +1504,7 @@ Ts_injectheader(db, header)
     rpmdb rdb;
     CODE:
 #ifdef RPM4_9_0
-    croak("injectheader>rpmdbAdd exists only in rpm < 4.9");
+    croak("injectheader>rpmdbAdd exists only in rpm < 4.9; unused anyway");
 #else
     rdb = rpmtsGetRdb(db);
     RETVAL = rpmdbAdd(rdb, 0, header, db, NULL);
@@ -1524,7 +1524,7 @@ Ts_deleteheader(db, sv_offset)
     rdb = rpmtsGetRdb(db);
     if (offset) {
 #ifdef RPM4_9_0
-        croak("injectheader>rpmdbAdd exists only in rpm < 4.9");
+        croak("deleteheader exists only in rpm < 4.9; unused anyway");
         RETVAL = 0;
 #else
         RETVAL = rpmdbRemove(rdb, 0, offset, db, NULL);
@@ -1557,7 +1557,7 @@ Ts_traverse(ts, callback = NULL, sv_tagname = NULL, sv_tagvalue = NULL, keylen =
     PRINTF_CALL;
 #endif
 #ifdef RPM4_9_0
-    croak("traverse is no more supported with rpm 4.9");
+    croak("traverse is no more supported with rpm 4.9; unused anyway");
 #else
 #ifdef RPM4_9_0
     ts = rpmtsLink(ts);
@@ -2770,7 +2770,7 @@ Spec_binheader(spec)
 
   but it's unused...
 */
-    croak("binheader is no more supported with rpm 4.9");
+    croak("binheader is no more supported with rpm 4.9; unused anyway");
 #else
     for (pkg = spec->packages; pkg != NULL; pkg = pkg->next)
         XPUSHs(sv_2mortal(sv_setref_pv(newSVpv("", 0), bless_header, (void *)headerLink(pkg->header))));
@@ -2783,7 +2783,7 @@ Spec_srcrpm(spec)
     const char *name, *version, *release;
     PPCODE:
 #ifdef RPM4_9_0
-    croak("srcrpm is no more supported with rpm 4.9");
+    croak("srcrpm is no more supported with rpm 4.9; FIXME");
 #else   
     (void) headerNVR(spec->packages->header, &name, &version, &release);
     XPUSHs(sv_2mortal(newSVpvf("%s/%s-%s-%s.%ssrc.rpm",
@@ -2806,7 +2806,7 @@ Spec_binrpm(spec)
     char * path;
     PPCODE:
 #ifdef RPM4_9_0
-    croak("binrpm is no more supported with rpm 4.9");
+    croak("binrpm is no more supported with rpm 4.9; FIXME");
 #else   
     for(pkg = spec->packages; pkg != NULL; pkg = pkg->next) {
         if (pkg->fileList == NULL)
@@ -2882,7 +2882,7 @@ Spec_specfile(spec)
     rpmSpec spec
     CODE:
 #ifdef RPM4_9_0
-    croak("specfile exists only in rpm < 4.9");
+    croak("specfile exists only in rpm < 4.9; unused anyway");
 #else
     RETVAL = spec->specFile;
 #endif
@@ -2944,7 +2944,7 @@ Spec_icon(spec)
     Package pkg;
     PPCODE:
 #ifdef RPM4_9_0
-    croak("icon exists only in rpm < 4.9");
+    croak("icon exists only in rpm < 4.9; unused anyway");
 #else
     for (pkg = spec->packages; pkg != NULL; pkg = pkg->next) {
         char * dest = NULL;
@@ -2965,7 +2965,7 @@ Spec_icon_url(spec)
     Package pkg;
     PPCODE:
 #ifdef RPM4_9_0
-    croak("icon_url exists only in rpm < 4.9");
+    croak("icon_url exists only in rpm < 4.9; unused anyway; unused anyway");
 #else
     for (pkg = spec->packages; pkg != NULL; pkg = pkg->next) {
         char * dest = NULL;
