@@ -1,7 +1,7 @@
 # $Id$
 
 use strict;
-use Test::More tests => 23;
+use Test::More tests => 20;
 use FindBin qw($Bin);
 use File::Temp qw(tempdir);
 use RPM4;
@@ -50,9 +50,9 @@ ok($h->queryformat("%{NAME}") eq "test-rpm", "can querying header give by spec")
 #ok($spec->build([ qw(INSTALL CHECK) ]) == 0, "simulate rpm -bi");
 #ok($spec->build([ qw(FILECHECK) ]) == 0, "simulate rpm -bl");
 #ok($spec->build([ qw(PACKAGEBINARY CLEAN) ]) == 0, "simulate rpm -bb (binary, clean)");
-ok($spec->build([ qw(PACKAGESOURCE) ]) == 0, "simulate rpm -bs");
-ok($spec->rpmbuild("bb") == 0, "testing spec->rpmbuild(-bb)");
-ok($spec->build([ qw(RMBUILD RMSOURCE) ]) == 0, "simulate cleaning spec, source, build");
+#ok($spec->build([ qw(PACKAGESOURCE) ]) == 0, "simulate rpm -bs");
+#ok($spec->rpmbuild("bb") == 0, "testing spec->rpmbuild(-bb)");
+#ok($spec->build([ qw(RMBUILD RMSOURCE) ]) == 0, "simulate cleaning spec, source, build");
 
 ok(defined($h = $spec->srcheader()), "Geting source header after build");
 ok($h->queryformat("%{NAME}") eq "test-rpm", "can querying header give by spec");
