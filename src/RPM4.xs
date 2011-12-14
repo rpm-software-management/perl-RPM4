@@ -2894,10 +2894,17 @@ Spec_sources(spec, is = 0)
     rpmSpec spec
     int is
     PREINIT:
-    struct Source *srcPtr;
+#ifdef RPM4_9_0
+    rpmSpecSrc srcPtr;
+#else
+    struct Source * srcPtr;
+#endif
     PPCODE:
 #ifdef RPM4_9_0
-    croak("sources exists only in rpm < 4.9");
+    rpmSpecSrcIter iter = rpmSpecSrcIterInit(spec);
+    while ((srcPtr = rpmSpecSrcIterNext(iter)) != NULL) {
+        XPUSHs(sv_2mortal(newSVpv(rpmSpecSrcFilename(srcPtr, 0), 0)));
+    }
 #else
     for (srcPtr = spec->sources; srcPtr != NULL; srcPtr = srcPtr->next) {
         if (is && !(srcPtr->flags & is))
@@ -2911,10 +2918,17 @@ Spec_sources_url(spec, is = 0)
     rpmSpec spec
     int is
     PREINIT:
+#ifdef RPM4_9_0
+    rpmSpecSrc srcPtr;
+#else
     struct Source * srcPtr;
+#endif
     PPCODE:
 #ifdef RPM4_9_0
-//    XPUSHs(sv_2mortal(newSVpv(get_name(pkg->h, RPMTAG_URL), 0)));
+    rpmSpecSrcIter iter = rpmSpecSrcIterInit(spec);
+    while ((srcPtr = rpmSpecSrcIterNext(iter)) != NULL) {
+        XPUSHs(sv_2mortal(newSVpv(rpmSpecSrcFilename(srcPtr, 1), 0)));
+    }
 #else
     for (srcPtr = spec->sources; srcPtr != NULL; srcPtr = srcPtr->next) {
         if (is && !(srcPtr->flags & is))
