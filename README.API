@@ -5,13 +5,13 @@ The following packages require perl-RPM4:
 (3) perl-Youri-Package-RPM-Builder
 (4) perl-Youri-Package-RPM-Updater
 (5) perl-Youri-Package
-(6) mdv-youri-core
+(6) mga-youri-core
 
 notes:
 - (5) doesn't use proposes both Youri::Package::URPM and
   Youri::Package::RPM4, and doesn't force usage of any.
 - (6) is a fork of perl-Youri-Package, which uses Youri::Package::URPM
-  (and so perl-RPM4 is unused)
+  (and so perl-RPM4 is unused but for RPM4::Sign and rpmssign())
 
 here is below the various functions/methods of perl-RPM4 used by the
 packages above.
@@ -19,10 +19,10 @@ packages above.
 RPM4::add_macro (2)(3)(4)
 RPM4::expand (2)(3)(4) [renamed expand_macro in rpm5]
 RPM4::installsrpm (2)(4)
-RPM4::rpmvercmp (4)
+RPM4::rpmvercmp
 RPM4::setverbosity (2)(4)
 RPM4::Sign->new
-  $sign->rpmssign [not available in rpm5]
+  $sign->rpmssign (6) [not available in rpm5]
 RPM4::Transaction->new
   $db->transadd (3) [renamed add_install in rpm5]
   $db->transcheck (3) [renamed check in rpm5]
