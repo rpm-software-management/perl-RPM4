@@ -1,4 +1,5 @@
 - disable tests segfaulting in rpmSpecBuild()
+- disable tests using unimplemented functions regarding rpm-4.9
 - implement more functions with rpm-4.9
 
 Version 0.24 - 09 November 2011
