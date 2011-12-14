@@ -2763,19 +2763,14 @@ Spec_binheader(spec)
     Package pkg;
     PPCODE:
 #ifdef RPM4_9_0
-/* we could use something like:
-	rpmSpecPkgIter iter = rpmSpecPkgIterInit(spec);
-        while ((pkg = rpmSpecPkgIterNext(iter)) != NULL)
-		(...)
-
-  but it's unused...
-*/
-    croak("binheader is no more supported with rpm 4.9; unused anyway");
+    rpmSpecPkgIter iter = rpmSpecPkgIterInit(spec);
+    while ((pkg = rpmSpecSrcIterNext(iter)) != NULL)
+        XPUSHs(sv_2mortal(sv_setref_pv(newSVpv("", 0), bless_header, (void *)headerLink(rpmSpecPkgHeader(pkg)))));
 #else
     for (pkg = spec->packages; pkg != NULL; pkg = pkg->next)
         XPUSHs(sv_2mortal(sv_setref_pv(newSVpv("", 0), bless_header, (void *)headerLink(pkg->header))));
 #endif
-    
+ 
 void
 Spec_srcrpm(spec)
     rpmSpec spec
