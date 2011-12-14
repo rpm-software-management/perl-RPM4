@@ -9,9 +9,9 @@ The following packages require perl-RPM4:
 
 notes:
 - (5) doesn't use proposes both Youri::Package::URPM and
-Youri::Package::RPM4, and doesn't force usage of any.
+  Youri::Package::RPM4, and doesn't force usage of any.
 - (6) is a fork of perl-Youri-Package, which uses Youri::Package::URPM
-(and so perl-RPM4 is unused)
+  (and so perl-RPM4 is unused)
 
 here is below the various functions/methods of perl-RPM4 used by the
 packages above.
