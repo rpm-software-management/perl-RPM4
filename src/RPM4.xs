@@ -762,7 +762,6 @@ buildhost()
     PREINIT:
     PPCODE:
 #ifdef RPM4_9_0
-    //croak("buildhost exists only in rpm < 4.9");
     static char hostname[1024];
     static int oneshot = 0;
     struct hostent *hbn;
