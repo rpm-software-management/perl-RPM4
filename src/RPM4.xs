@@ -2810,7 +2810,8 @@ Spec_binrpm(spec)
     Header header;
     PPCODE:
 #ifdef RPM4_9_0
-    croak("binrpm is no more supported with rpm 4.9; FIXME");
+    rpmSpecPkgIter iter = rpmSpecPkgIterInit(spec);
+    while ((pkg = rpmSpecSrcIterNext(iter)) != NULL) {
 #else   
     for(pkg = spec->packages; pkg != NULL; pkg = pkg->next) {
         if (pkg->fileList == NULL)
@@ -2818,7 +2819,11 @@ Spec_binrpm(spec)
 #endif
         /* headerCopyTags(h, pkg->header, copyTags); */
         binFormat = rpmGetPath("%{_rpmfilename}", NULL);
+#ifdef RPM4_9_0
+        header = rpmSpecSourceHeader(spec);
+#else   
         header = pkg->header;
+#endif
         binRpm = headerFormat(header, binFormat, NULL);
         free(binFormat);
         path = rpmGetPath("%{_rpmdir}/", binRpm, NULL);
