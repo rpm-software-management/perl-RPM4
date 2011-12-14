@@ -2784,7 +2784,7 @@ Spec_srcrpm(spec)
     Header header = NULL;
     PPCODE:
 #ifdef RPM4_9_0
-    croak("srcrpm is no more supported with rpm 4.9; FIXME");
+    header = rpmSpecSourceHeader(spec);
 #else   
     header = spec->packages->header;
 #endif
@@ -2792,7 +2792,8 @@ Spec_srcrpm(spec)
     XPUSHs(sv_2mortal(newSVpvf("%s/%s-%s-%s.%ssrc.rpm",
         rpmGetPath("%{_srcrpmdir}", NULL),
         name, version, release,
-        spec->noSource ? "no" : ""
+	// FIXME: we basically want genSourceRpmName() which is internal :-(
+        "" //spec->noSource ? "no" : ""
         )));
     headerFreeTag(header, name, RPM_STRING_TYPE);
     headerFreeTag(header, version, RPM_STRING_TYPE);
