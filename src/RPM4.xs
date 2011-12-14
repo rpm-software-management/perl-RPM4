@@ -2781,20 +2781,22 @@ Spec_srcrpm(spec)
     rpmSpec spec
     PREINIT:
     const char *name, *version, *release;
+    Header header = NULL;
     PPCODE:
 #ifdef RPM4_9_0
     croak("srcrpm is no more supported with rpm 4.9; FIXME");
 #else   
-    (void) headerNVR(spec->packages->header, &name, &version, &release);
+    header = spec->packages->header;
+#endif
+    (void) headerNVR(header, &name, &version, &release);
     XPUSHs(sv_2mortal(newSVpvf("%s/%s-%s-%s.%ssrc.rpm",
         rpmGetPath("%{_srcrpmdir}", NULL),
         name, version, release,
         spec->noSource ? "no" : ""
         )));
-    headerFreeTag(spec->packages->header, name, RPM_STRING_TYPE);
-    headerFreeTag(spec->packages->header, version, RPM_STRING_TYPE);
-    headerFreeTag(spec->packages->header, release, RPM_STRING_TYPE);
-#endif
+    headerFreeTag(header, name, RPM_STRING_TYPE);
+    headerFreeTag(header, version, RPM_STRING_TYPE);
+    headerFreeTag(header, release, RPM_STRING_TYPE);
 
 void
 Spec_binrpm(spec)
