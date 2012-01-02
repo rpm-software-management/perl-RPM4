@@ -319,6 +319,7 @@ int logcallback(rpmlogRec rec, rpmlogCallbackData data) {
         call_sv(log_callback_function, G_DISCARD | G_SCALAR);
         SPAGAIN;
     }
+    return RPMLOG_DEFAULT;
 }
 
 /**************************************************
