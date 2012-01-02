@@ -2764,7 +2764,7 @@ Spec_binheader(spec)
     PPCODE:
 #ifdef RPM4_9_0
     rpmSpecPkgIter iter = rpmSpecPkgIterInit(spec);
-    while ((pkg = rpmSpecSrcIterNext(iter)) != NULL)
+    while ((pkg = rpmSpecPkgIterNext(iter)) != NULL)
         XPUSHs(sv_2mortal(sv_setref_pv(newSVpv("", 0), bless_header, (void *)headerLink(rpmSpecPkgHeader(pkg)))));
 #else
     for (pkg = spec->packages; pkg != NULL; pkg = pkg->next)
@@ -2806,7 +2806,7 @@ Spec_binrpm(spec)
     PPCODE:
 #ifdef RPM4_9_0
     rpmSpecPkgIter iter = rpmSpecPkgIterInit(spec);
-    while ((pkg = rpmSpecSrcIterNext(iter)) != NULL) {
+    while ((pkg = rpmSpecPkgIterNext(iter)) != NULL) {
 #else   
     for(pkg = spec->packages; pkg != NULL; pkg = pkg->next) {
         if (pkg->fileList == NULL)
