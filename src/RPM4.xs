@@ -470,7 +470,7 @@ int _header_vs_dep(Header h, rpmds dep, int nopromote) {
 }
 
 int _headername_vs_dep(Header h, rpmds dep, int nopromote) {
-    char *name; int type;
+    char *name; rpm_tagtype_t type;
     int rc = 0;
     CHECK_RPMDS_IX(dep);
     headerGetEntry(h, RPMTAG_NAME, &type, (void **) &name, NULL);
@@ -1092,8 +1092,8 @@ Header_tag(h, sv_tag)
     SV * sv_tag
     PREINIT:
     void *ret = NULL;
-    int type;
-    int n;
+    rpm_tagtype_t type;
+    rpm_tagtype_t n;
     rpmTag tag = -1;
     PPCODE:
     if (SvIOK(sv_tag)) {
@@ -1145,12 +1145,12 @@ Header_tag(h, sv_tag)
         }
     headerFreeTag(h, ret, type);
 
-int
+unsigned int
 Header_tagtype(h, sv_tag)
     Header h
     SV * sv_tag
     PREINIT:
-    int type;
+    rpm_tagtype_t type;
     rpmTag tag = -1;
     CODE:
     if (SvIOK(sv_tag)) {
