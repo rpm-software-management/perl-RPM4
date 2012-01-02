@@ -41,4 +41,5 @@ WriteMakefile(
         'File::Temp' => 0,
         'MDV::Packdrakeng' => 0,
     },
+    dist => { COMPRESS => "xz", SUFFIX => ".xz" },
 );
