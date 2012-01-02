@@ -969,7 +969,6 @@ Header_string(h, no_header_magic = 0)
     int no_header_magic
     PREINIT:
     char * string = NULL;
-    int offset = 8; /* header magic length */
     char * ptr = NULL;
     int hsize = 0;
     PPCODE:
@@ -2835,7 +2834,6 @@ void
 Spec_check(spec, ts = NULL)
     rpmSpec spec
     PREINIT:
-    int rc;
     rpmts ts = rpmtsCreate();
     rpmps ps;
     PPCODE:
@@ -3031,8 +3029,6 @@ ps_isignore(ps, numpb)
     rpmps ps
     int numpb
     PREINIT:
-    rpmProblem p;
-    int i;
     CODE:
     RETVAL = 0; /* ignoreProblem is obsolete and always false */
     OUTPUT:
