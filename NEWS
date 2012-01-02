@@ -1,4 +1,5 @@
 - fix for a random segfault
+- report script errors
 
 Version 0.25 - 14 December 2011
 
