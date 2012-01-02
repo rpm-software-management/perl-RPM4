@@ -444,7 +444,9 @@ int _specbuild(rpmts ts, rpmSpec spec, SV * sv_buildflags) {
     rpmBuildFlags buildflags = sv2rpmbuildflags(sv_buildflags);
     if (buildflags == RPMBUILD_NONE) croak("No action given for build");
 #ifdef RPM4_9_0
-    return rpmSpecBuild(spec, buildflags);
+    BTA_t flags = calloc(1, sizeof(*flags));
+    flags->buildAmount = buildflags;
+    return rpmSpecBuild(spec, flags);
 #else
     return buildSpec(ts, spec, buildflags, 0);
 #endif
