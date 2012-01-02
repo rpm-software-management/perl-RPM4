@@ -184,17 +184,7 @@ static rpmTag sv2dbquerytag(SV * sv_tag) {
 /* This function replace the standard rpmShowProgress callback
  * during transaction to allow perl callback */
 
-#ifdef RPM4_4_5
-#define RPM_CALLBACK_AMOUNT_TYPE unsigned long long
-#else
-#define RPM_CALLBACK_AMOUNT_TYPE unsigned long
-#endif
-
-#ifdef RPM4_4_5
-rpmCallbackFunction
-#else
 void *
-#endif 
     transCallback(const void *h,
        const rpmCallbackType what,
        const rpm_loff_t amount,
@@ -1257,13 +1247,7 @@ Header_dep(header, type, scaremem = O_SCAREMEM)
     rpmTag tag;
     PPCODE:
     tag = sv2deptag(type);
-    ds = rpmdsNew(header, tag,
-#ifdef RPM4_4_7
-        0
-#else
-        scaremem
-#endif
-    );
+    ds = rpmdsNew(header, tag, scaremem);
     ds = rpmdsInit(ds);
     if (ds != NULL)
         if (rpmdsNext(ds) >= 0) {
@@ -2085,14 +2069,12 @@ void
 rpmlibdep()
     PREINIT:
     rpmds Dep = NULL;
-#ifndef RPM4_4_3
     rpmds next;
     const char ** provNames;
     int * provFlags;
     const char ** provVersions;
     int num = 0;
     int i;
-#endif
     PPCODE:
 #if 0
     num = rpmGetRpmlibProvides(&provNames, &provFlags, &provVersions);
@@ -2122,76 +2104,31 @@ void
 rpmsysinfodep(sysinfofile = NULL)
     char * sysinfofile
     PREINIT:
-#ifdef RPM4_4_3
-    rpmds Dep = NULL;
-#endif
     PPCODE:
-#ifdef RPM4_4_3
-    if(!rpmdsSysinfo(&Dep, sysinfofile)) {
-        XPUSHs(sv_2mortal(sv_setref_pv(newSVpv("", 0), bless_rpmds, Dep)));
-    }
-#else
-#endif
 
 void
 rpmgetconfdep(path = NULL)
     char * path
     PREINIT:
-#ifdef RPM4_4_3
-    rpmds Dep = NULL;
-#endif
     PPCODE:
-#ifdef RPM4_4_3
-    if(!rpmdsGetconf(&Dep, path)) {
-        XPUSHs(sv_2mortal(sv_setref_pv(newSVpv("", 0), bless_rpmds, Dep)));
-    }
-#else
-#endif
 
 void
 rpmcpuinfodep(path = NULL)
     char * path
     PREINIT:
-#ifdef RPM4_4_3
-    rpmds Dep = NULL;
-#endif
     PPCODE:
-#ifdef RPM4_4_3
-    if(!rpmdsCpuinfo(&Dep, path)) {
-        XPUSHs(sv_2mortal(sv_setref_pv(newSVpv("", 0), bless_rpmds, Dep)));
-    }
-#else
-#endif
 
 void
 rpmunamedep()
     PREINIT:
-#ifdef RPM4_4_3
-    rpmds Dep = NULL;
-#endif
     PPCODE:
-#ifdef RPM4_4_3
-    if(!rpmdsUname(&Dep, NULL)) {
-        XPUSHs(sv_2mortal(sv_setref_pv(newSVpv("", 0), bless_rpmds, Dep)));
-    }
-#else
-#endif
 
 void
 rpmpipedep(cmd, tag = 0)
     char * cmd
     int tag
     PREINIT:
-#ifdef RPM4_4_3
-    rpmds Dep = NULL;
-#endif
     PPCODE:
-#ifdef RPM4_4_3
-    if(!rpmdsPipe(&Dep, tag, cmd)) {
-        XPUSHs(sv_2mortal(sv_setref_pv(newSVpv("", 0), bless_rpmds, Dep)));
-    }
-#else
-#endif
     
 MODULE = RPM4 	PACKAGE = RPM4::Header::Dependencies  PREFIX = Dep_
 
