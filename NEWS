@@ -1,3 +1,5 @@
+Version 0.26 - 21 December 2011
+
 - fix for a random segfault
 - report script errors
 
