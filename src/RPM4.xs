@@ -2912,6 +2912,8 @@ Spec_sources(spec, is = 0)
 #ifdef RPM4_9_0
     rpmSpecSrcIter iter = rpmSpecSrcIterInit(spec);
     while ((srcPtr = rpmSpecSrcIterNext(iter)) != NULL) {
+        if (is && !(rpmSpecSrcFlags(srcPtr) & is))
+            continue;
         XPUSHs(sv_2mortal(newSVpv(rpmSpecSrcFilename(srcPtr, 0), 0)));
     }
 #else
@@ -2936,6 +2938,8 @@ Spec_sources_url(spec, is = 0)
 #ifdef RPM4_9_0
     rpmSpecSrcIter iter = rpmSpecSrcIterInit(spec);
     while ((srcPtr = rpmSpecSrcIterNext(iter)) != NULL) {
+        if (is && !(rpmSpecSrcFlags(srcPtr) & is))
+            continue;
         XPUSHs(sv_2mortal(newSVpv(rpmSpecSrcFilename(srcPtr, 1), 0)));
     }
 #else
