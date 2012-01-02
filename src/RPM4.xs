@@ -1562,9 +1562,6 @@ Ts_traverse(ts, callback = NULL, sv_tagname = NULL, sv_tagvalue = NULL, keylen =
     PRINTF_CALL;
 #endif
 #ifdef RPM4_9_0
-    croak("traverse is no more supported with rpm 4.9; unused anyway");
-#else
-#ifdef RPM4_9_0
     ts = rpmtsLink(ts);
 #else
     ts = rpmtsLink(ts, "RPM4 Db::traverse()");
@@ -1598,7 +1595,8 @@ Ts_traverse(ts, callback = NULL, sv_tagname = NULL, sv_tagvalue = NULL, keylen =
                 exclude[i] = SvUV(*isv);
             }
 #ifdef RPM4_9_0
-            rpmtsPrunedIterator(ts, exclude, av_len(av_exclude) + 1);
+            //FIXME: rpmtsPrunedIterator() is rpmlib internal only:
+            //rpmtsPrunedIterator(ts, exclude, av_len(av_exclude) + 1);
 #else
             rpmdbPruneIterator(mi, exclude, av_len(av_exclude) + 1, 0);
 #endif
@@ -1632,7 +1630,6 @@ Ts_traverse(ts, callback = NULL, sv_tagname = NULL, sv_tagvalue = NULL, keylen =
     } else
         RETVAL = -1;
     ts = rpmtsFree(ts);
-#endif
     OUTPUT:
     RETVAL
 

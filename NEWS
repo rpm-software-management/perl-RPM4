@@ -1,5 +1,6 @@
 - make Spec->build works with rpm-4.9
 - make initdb do all the needed work
+- make traverse usefull again with rpm-4.9
 
 Version 0.26 - 21 December 2011
 
