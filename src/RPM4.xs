@@ -184,7 +184,7 @@ static rpmTag sv2dbquerytag(SV * sv_tag) {
 /* This function replace the standard rpmShowProgress callback
  * during transaction to allow perl callback */
 
-void *
+static void *
     transCallback(const void *h,
        const rpmCallbackType what,
        const rpm_loff_t amount,
