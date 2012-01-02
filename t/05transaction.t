@@ -1,7 +1,7 @@
 # $Id$
 
 use strict;
-use Test::More tests => 30;
+use Test::More tests => 31;
 use FindBin qw($Bin);
 use File::Path;
 use File::Temp qw/tempdir/;
@@ -20,7 +20,7 @@ RPM4::add_macro("_dbpath $testdir");
 
 ok(RPM4::rpmdbinit() == 0 || -f "$testdir/Packages", "initdb works");
 ok(RPM4::rpmdbrebuild() == 0, "rebuild database");
-#ok(RPM4::rpmdbverify() == 0, "Verify empty");
+ok(RPM4::rpmdbverify() == 0, "Verify empty");
 
 my $ts;
 ok($ts = RPM4::Transaction->new(), "Open a new database");
