@@ -1,3 +1,5 @@
+- fix build with rpm-4.10.0
+
 Version 0.27 - 21 December 2011
 
 - make Spec->build works with rpm-4.9
