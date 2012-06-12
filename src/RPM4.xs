@@ -1080,12 +1080,14 @@ Header_listtag(h)
     Header h
     PREINIT:
     HeaderIterator iterator;
-    int tag;
+    struct rpmtd_s td;
     PPCODE:
     iterator = headerInitIterator(h);
-    while (headerNextIterator(iterator, &tag, NULL, NULL, NULL)) {
-        XPUSHs(sv_2mortal(newSViv(tag)));
+    while (headerNext(iterator, &td)) {
+        XPUSHs(sv_2mortal(newSViv(td.tag)));
+        rpmtdFreeData(&td);
     }
+    rpmtdFreeData(&td);
     headerFreeIterator(iterator);
     
 int
