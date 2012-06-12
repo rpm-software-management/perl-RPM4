@@ -1,3 +1,4 @@
+- functions that not are implemented since switching to rpm-4.6 now die
 - use rpm-4.6+ API, not rpm-4.4 compatibility one
   (fix some memleaks btw)
 
