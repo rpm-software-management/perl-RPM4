@@ -1689,7 +1689,7 @@ Ts_transadd(ts, header, key = NULL, upgrade = 1, sv_relocation = NULL, force = 0
 /*        if (! (headerGetEntry(eiu->h, RPMTAG_PREFIXES, &pft,
                        (void **) &paths, &c) && (c == 1))) { */
         if (! headerIsEntry(header, RPMTAG_PREFIXES)) {
-            rpmMessage(RPMLOG_ERR,
+            rpmlog(RPMLOG_ERR,
                    _("package %s is not relocatable\n"), "");
             XPUSHi((IV)1);
             XSRETURN(1);
