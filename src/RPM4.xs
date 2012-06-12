@@ -1015,7 +1015,7 @@ Header_removetag(h, sv_tag)
         tag = tagValue(SvPV_nolen(sv_tag));
     }
     if (tag > 0)
-        RETVAL = headerRemoveEntry(h, tag);
+        RETVAL = headerDel(h, tag);
     else
         RETVAL = 1;
     OUTPUT:
