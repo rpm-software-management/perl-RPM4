@@ -181,6 +181,30 @@ static rpmTag sv2dbquerytag(SV * sv_tag) {
 
 #define sv2tagtype(sv) sv2constant((sv), "rpmtagtype")
 
+/*
+ * From URPM.xs:
+ */
+
+static char *
+get_name(Header header, int32_t tag) {
+  struct rpmtd_s val;
+
+  headerGet(header, tag, &val, HEADERGET_MINMEM);
+  char *name = (char *) rpmtdGetString(&val);
+  rpmtdFreeData(&val);
+  return name ? name : "";
+}
+
+static char*
+get_arch(Header header) {
+     return headerIsEntry(header, RPMTAG_SOURCERPM) ? get_name(header, RPMTAG_ARCH) : "src";
+}
+
+/*
+ * End of URPM import
+ * */
+
+
 /* This function replace the standard rpmShowProgress callback
  * during transaction to allow perl callback */
 
