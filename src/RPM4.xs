@@ -2746,16 +2746,16 @@ Spec_srcrpm(spec)
 #else   
     header = spec->packages->header;
 #endif
-    (void) headerNVR(header, &name, &version, &release);
+    name = get_name(header, RPMTAG_NAME);
+    version = get_name(header, RPMTAG_VERSION);
+    release = get_name(header, RPMTAG_RELEASE);
+
     XPUSHs(sv_2mortal(newSVpvf("%s/%s-%s-%s.%ssrc.rpm",
         rpmGetPath("%{_srcrpmdir}", NULL),
         name, version, release,
 	// FIXME: we basically want genSourceRpmName() which is internal :-(
         "" //spec->noSource ? "no" : ""
         )));
-    headerFreeTag(header, name, RPM_STRING_TYPE);
-    headerFreeTag(header, version, RPM_STRING_TYPE);
-    headerFreeTag(header, release, RPM_STRING_TYPE);
 
 void
 Spec_binrpm(spec)
