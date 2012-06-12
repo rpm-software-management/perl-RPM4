@@ -493,12 +493,15 @@ int _headername_vs_dep(Header h, rpmds dep, int nopromote) {
     char *name; rpm_tagtype_t type;
     int rc = 0;
     CHECK_RPMDS_IX(dep);
-    headerGetEntry(h, RPMTAG_NAME, &type, (void **) &name, NULL);
+    struct rpmtd_s val;
+
+    headerGet(h, RPMTAG_NAME, &val, HEADERGET_MINMEM);
+    name = (char *) rpmtdGetString(&val);
     if (strcmp(name, rpmdsN(dep)) != 0)
         rc = 0;
     else
         rc = rpmdsNVRMatchesDep(h, dep, nopromote);
-    headerFreeData(name, type);
+    rpmtdFreeData(&val);
     return rc;
     /* return 1 if match */
 }
@@ -1110,9 +1113,6 @@ Header_tag(h, sv_tag)
     Header h
     SV * sv_tag
     PREINIT:
-    void *ret = NULL;
-    rpm_tagtype_t type;
-    rpm_tagtype_t n;
     rpmTag tag = -1;
     PPCODE:
     if (SvIOK(sv_tag)) {
@@ -1120,24 +1120,29 @@ Header_tag(h, sv_tag)
     } else if (SvPOK(sv_tag)) {
         tag = tagValue(SvPV_nolen(sv_tag));
     }
-    if (tag > 0)
-        if (headerGetEntry(h, tag, &type, &ret, &n)) {
+    if (tag > 0) {
+        struct rpmtd_s val;
+        if (headerGet(h, tag, &val, HEADERGET_DEFAULT)) {
+            int type = val.type;
+            int n = rpmtdCount(&val);
+
             switch(type) {
                 case RPM_STRING_ARRAY_TYPE:
                     {
                         int i;
-                        char **s;
 
                         EXTEND(SP, n);
-                        s = (char **)ret;
+                        rpmtdInit(&val);
         
                         for (i = 0; i < n; i++) {
-                            PUSHs(sv_2mortal(newSVpv(s[i], 0)));
+                            PUSHs(sv_2mortal(newSVpv(rpmtdNextString(&val), 0)));
                         }
                     }
                 break;
-                case RPM_STRING_TYPE:
-                    PUSHs(sv_2mortal(newSVpv((char *)ret, 0)));
+                case RPM_STRING_TYPE: {
+                    char *name = (char *) rpmtdGetString(&val);
+                    PUSHs(sv_2mortal(newSVpv(name, 0)));
+                };
                 break;
                 case RPM_CHAR_TYPE:
                 case RPM_INT8_TYPE:
@@ -1145,32 +1150,34 @@ Header_tag(h, sv_tag)
                 case RPM_INT32_TYPE:
                     {
                         int i;
-                        int *r;
 
                         EXTEND(SP, n);
-                        r = (int *)ret;
+                        rpmtdInit(&val);
 
                         for (i = 0; i < n; i++) {
-                            PUSHs(sv_2mortal(newSViv(r[i])));
+                            rpmtdNext(&val);
+                            PUSHs(sv_2mortal(newSViv(rpmtdGetNumber(&val))));
                         }
                     }
                 break;
                 case RPM_BIN_TYPE:
-                    PUSHs(sv_2mortal(newSVpv((char *)ret, n)));
+                    /* XXX HACK ALERT: element field abused as no. bytes of binary data. */
+                    PUSHs(sv_2mortal(newSVpv((char *)val.data, val.count)));
                 break;
                 default:
                     croak("unknown rpm tag type %d", type);
             }
+            rpmtdFreeData(&val);
         }
-    headerFreeTag(h, ret, type);
+    }
 
 unsigned int
 Header_tagtype(h, sv_tag)
     Header h
     SV * sv_tag
     PREINIT:
-    rpm_tagtype_t type;
     rpmTag tag = -1;
+    struct rpmtd_s td;
     CODE:
     if (SvIOK(sv_tag)) {
         tag = SvIV(sv_tag);
@@ -1179,8 +1186,9 @@ Header_tagtype(h, sv_tag)
     }
     RETVAL = RPM_NULL_TYPE;
     if (tag > 0)
-        if (headerGetEntry(h, tag, &type, NULL, NULL))
-            RETVAL = type;
+        if (headerGet(h, tag, &td, HEADERGET_DEFAULT))
+            RETVAL = td.type;
+    rpmtdFreeData(&td);
     OUTPUT:
     RETVAL
     
@@ -1207,11 +1215,11 @@ Header_fullname(h)
     char *arch;
     PPCODE:
     if (h) {
-        headerGetEntry(h, RPMTAG_NAME, NULL, (void *) &name, NULL);
-        headerGetEntry(h, RPMTAG_VERSION, NULL, (void *) &version, NULL);
-        headerGetEntry(h, RPMTAG_RELEASE, NULL, (void *) &release, NULL);
-        headerGetEntry(h, RPMTAG_ARCH, NULL, (void *) &arch, NULL);
-        
+        name = get_name(h, RPMTAG_NAME);
+        version = get_name(h, RPMTAG_VERSION);
+        release = get_name(h, RPMTAG_RELEASE);
+        arch = get_arch(h);
+
         if (gimme == G_SCALAR) {
             XPUSHs(sv_2mortal(newSVpvf("%s-%s-%s.%s",
                     name,
@@ -1231,10 +1239,6 @@ Header_fullname(h)
             }
         }
     }
-    headerFreeTag(h, name, RPM_STRING_TYPE);
-    headerFreeTag(h, version, RPM_STRING_TYPE);
-    headerFreeTag(h, release, RPM_STRING_TYPE);
-    headerFreeTag(h, arch, RPM_STRING_TYPE);
 
 void
 Header_nevr(header)
