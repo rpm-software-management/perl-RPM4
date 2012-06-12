@@ -1047,25 +1047,33 @@ Header_addtag(h, sv_tag, sv_tagtype, ...)
     /* if (tag == RPMTAG_OLDFILENAMES)
         expandFilelist(h); */
     for (i = 3; (i < items) && RETVAL; i++) {
+       struct rpmtd_s td = {
+           .tag = tag,
+           .type = tagtype,
+           .data = (void *) &value,
+           .count = 1,
+        };
         switch (tagtype) {
             case RPM_CHAR_TYPE:
             case RPM_INT8_TYPE:
             case RPM_INT16_TYPE:
             case RPM_INT32_TYPE:
                 ivalue = SvUV(ST(i));
-                RETVAL = headerAddOrAppendEntry(h, tag, tagtype, &ivalue, 1);
+                td.data = (void *) &ivalue;
+                RETVAL = headerPut(h, &td, HEADERPUT_APPEND);
                 break;
+            case RPM_STRING_TYPE:
             case RPM_BIN_TYPE:
                 value = (char *)SvPV(ST(i), len);
-                RETVAL = headerAddEntry(h, tag, tagtype, value, len);
+                RETVAL = headerPutString(h, tag, value);
                 break;
             case RPM_STRING_ARRAY_TYPE:
                 value = SvPV_nolen(ST(i));
-                RETVAL = headerAddOrAppendEntry(h, tag, tagtype, &value, 1);
+                RETVAL = headerPut(h, &td, HEADERPUT_APPEND);
                 break;
             default:
                 value = SvPV_nolen(ST(i));
-                RETVAL = headerAddOrAppendEntry(h, tag, tagtype, value, 1); 
+                RETVAL = headerPut(h, &td, HEADERPUT_APPEND);
                 break;
         }
     }
