@@ -1490,11 +1490,11 @@ Ts_injectheader(db, header)
     rpmts db
     Header header
     PREINIT:
-    rpmdb rdb;
     CODE:
 #ifdef RPM4_9_0
     croak("injectheader>rpmdbAdd exists only in rpm < 4.9; unused anyway");
 #else
+    rpmdb rdb;
     rdb = rpmtsGetRdb(db);
     RETVAL = rpmdbAdd(rdb, 0, header, db, NULL);
 #endif
