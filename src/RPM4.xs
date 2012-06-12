@@ -638,7 +638,7 @@ int
 tagValue(tagname)
     char * tagname
     CODE:
-    RETVAL = tagValue((const char *) tagname);
+    RETVAL = rpmTagGetValue((const char *) tagname);
     OUTPUT:
     RETVAL
 
@@ -1012,7 +1012,7 @@ Header_removetag(h, sv_tag)
     if (SvIOK(sv_tag)) {
         tag = SvIV(sv_tag);
     } else if (SvPOK(sv_tag)) {
-        tag = tagValue(SvPV_nolen(sv_tag));
+        tag = rpmTagGetValue(SvPV_nolen(sv_tag));
     }
     if (tag > 0)
         RETVAL = headerDel(h, tag);
@@ -1037,7 +1037,7 @@ Header_addtag(h, sv_tag, sv_tagtype, ...)
     if (SvIOK(sv_tag)) {
         tag = SvIV(sv_tag);
     } else if (SvPOK(sv_tag)) {
-        tag = tagValue(SvPV_nolen(sv_tag));
+        tag = rpmTagGetValue(SvPV_nolen(sv_tag));
     }
     tagtype = sv2tagtype(sv_tagtype);
     if (tag > 0)
@@ -1100,7 +1100,7 @@ Header_hastag(h, sv_tag)
     if (SvIOK(sv_tag)) {
         tag = SvIV(sv_tag);
     } else if (SvPOK(sv_tag)) {
-        tag = tagValue(SvPV_nolen(sv_tag));
+        tag = rpmTagGetValue(SvPV_nolen(sv_tag));
     }    
     if (tag > 0)
         RETVAL = headerIsEntry(h, tag);
@@ -1120,7 +1120,7 @@ Header_tag(h, sv_tag)
     if (SvIOK(sv_tag)) {
         tag = SvIV(sv_tag);
     } else if (SvPOK(sv_tag)) {
-        tag = tagValue(SvPV_nolen(sv_tag));
+        tag = rpmTagGetValue(SvPV_nolen(sv_tag));
     }
     if (tag > 0) {
         struct rpmtd_s val;
@@ -1184,7 +1184,7 @@ Header_tagtype(h, sv_tag)
     if (SvIOK(sv_tag)) {
         tag = SvIV(sv_tag);
     } else if (SvPOK(sv_tag)) {
-        tag = tagValue(SvPV_nolen(sv_tag));
+        tag = rpmTagGetValue(SvPV_nolen(sv_tag));
     }
     RETVAL = RPM_NULL_TYPE;
     if (tag > 0)
