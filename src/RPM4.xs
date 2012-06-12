@@ -250,7 +250,7 @@ static void *
             s_what = "INST_START";
             if (h) {
                 mXPUSHs(newSVpv("header", 0));
-                mXPUSHs(sv_setref_pv(newSVpv("", 0), bless_header, &h));
+                mXPUSHs(sv_setref_pv(newSVpvs(""), bless_header, &h));
 #ifdef HDRPMMEM
                 PRINTF_NEW(bless_header, &h, -1);
 #endif
@@ -360,7 +360,7 @@ void _rpm2header(rpmts ts, char * filename, int checkmode) {
 		    ret = headerFree(ret); /* For checking the package, we don't keep the header */
         } else {
             if (rc == 0) {
-        	    mXPUSHs(sv_setref_pv(newSVpv("", 0), bless_header, (void *)ret));
+        	    mXPUSHs(sv_setref_pv(newSVpvs(""), bless_header, (void *)ret));
 #ifdef HDRPMMEM
                 PRINTF_NEW(bless_header, ret, ret->nrefs);
 #endif
@@ -394,7 +394,7 @@ void _newdep(SV * sv_deptag, char * name, SV * sv_sense, SV * sv_evr) {
         name,
         evr ? evr : "", sense);
     if (Dep) {
-        mXPUSHs(sv_setref_pv(newSVpv("", 0), bless_rpmds, Dep));
+        mXPUSHs(sv_setref_pv(newSVpvs(""), bless_rpmds, Dep));
     }
     PUTBACK;
 }
@@ -443,7 +443,7 @@ void _newspec(rpmts ts, char * filename, SV * svpassphrase, SV * svrootdir, SV *
 #endif
     }
     if (spec) {
-        mXPUSHs(sv_setref_pv(newSVpv("", 0), bless_spec, (void *)spec));
+        mXPUSHs(sv_setref_pv(newSVpvs(""), bless_spec, (void *)spec));
 #ifdef HDRPMMEM
         PRINTF_NEW(bless_spec, spec, -1);
 #endif
@@ -830,7 +830,7 @@ headernew()
     PREINIT:
     Header h = headerNew();
     PPCODE:
-    mXPUSHs(sv_setref_pv(newSVpv("", 0), bless_header, (void *)h));
+    mXPUSHs(sv_setref_pv(newSVpvs(""), bless_header, (void *)h));
 #ifdef HDRPMMEM
     PRINTF_NEW(bless_header, h, h->nrefs);
 #endif
@@ -858,7 +858,7 @@ stream2header(fp, no_header_magic = 0, callback = NULL)
                 ENTER;
                 SAVETMPS;
                 PUSHMARK(SP);
-                mXPUSHs(sv_setref_pv(newSVpv("", 0), bless_header, (void *)header));
+                mXPUSHs(sv_setref_pv(newSVpvs(""), bless_header, (void *)header));
 #ifdef HDRPMMEM
                 PRINTF_NEW(bless_header, header, header->nrefs);
 #endif
@@ -871,7 +871,7 @@ stream2header(fp, no_header_magic = 0, callback = NULL)
         } else {
             header = headerRead(fd, no_header_magic ? HEADER_MAGIC_NO : HEADER_MAGIC_YES);
             if (header) {
-                mXPUSHs(sv_setref_pv(newSVpv("", 0), bless_header, (void *)header));
+                mXPUSHs(sv_setref_pv(newSVpvs(""), bless_header, (void *)header));
 #ifdef HDRPMMEM
                 PRINTF_NEW(bless_header, header, header->nrefs);
 #endif
@@ -977,7 +977,7 @@ Header_copy(h)
     Header hcopy;
     PPCODE:
     hcopy = headerCopy(h);
-    mXPUSHs(sv_setref_pv(newSVpv("", 0), bless_header, (void *)hcopy));
+    mXPUSHs(sv_setref_pv(newSVpvs(""), bless_header, (void *)hcopy));
 #ifdef HDRPMMEM
     PRINTF_NEW(bless_header, hcopy, hcopy->nrefs);
 #endif
@@ -1289,7 +1289,7 @@ Header_dep(header, type, scaremem = O_SCAREMEM)
     ds = rpmdsInit(ds);
     if (ds != NULL)
         if (rpmdsNext(ds) >= 0) {
-            mXPUSHs(sv_setref_pv(newSVpv("", 0), bless_rpmds, ds));
+            mXPUSHs(sv_setref_pv(newSVpvs(""), bless_rpmds, ds));
 #ifdef HDRPMMEM
             PRINTF_NEW(bless_rpmds, ds, ds->nrefs);
 #endif
@@ -1434,7 +1434,7 @@ emptydb()
     PREINIT:
     rpmts ts = rpmtsCreate();
     PPCODE:
-    mXPUSHs(sv_setref_pv(newSVpv("", 0), bless_rpmts, (void *)ts));
+    mXPUSHs(sv_setref_pv(newSVpvs(""), bless_rpmts, (void *)ts));
 #ifdef HDRPMMEM
     PRINTF_NEW(bless_rpmts, ts, ts->nrefs);
 #endif
@@ -1456,7 +1456,7 @@ newdb(write = 0, rootdir = NULL)
     /* is O_CREAT a good idea here ? */
     /* is the rpmtsOpenDB really need ? */
     if (rpmtsOpenDB(ts, write ? O_RDWR | O_CREAT : O_RDONLY) == 0) {
-        mXPUSHs(sv_setref_pv(newSVpv("", 0), bless_rpmts, (void *)ts));
+        mXPUSHs(sv_setref_pv(newSVpvs(""), bless_rpmts, (void *)ts));
 #ifdef HDRPMMEM
         PRINTF_NEW(bless_rpmts, ts, ts->nrefs);
 #endif
@@ -1475,7 +1475,7 @@ Ts_new(perlclass, rootdir = NULL)
     PPCODE:
     if (rootdir)
         rpmtsSetRootDir(ts, rootdir);
-    mXPUSHs(sv_setref_pv(newSVpv("", 0), perlclass, (void *)ts));
+    mXPUSHs(sv_setref_pv(newSVpvs(""), perlclass, (void *)ts));
  
 void
 Ts_DESTROY(ts)
@@ -1629,7 +1629,7 @@ Ts_traverse(ts, callback = NULL, sv_tagname = NULL, sv_tagvalue = NULL, keylen =
                 ENTER;
                 SAVETMPS;
                 PUSHMARK(SP);
-                mXPUSHs(sv_setref_pv(newSVpv("", 0), bless_header, headerLink(header)));
+                mXPUSHs(sv_setref_pv(newSVpvs(""), bless_header, headerLink(header)));
 #ifdef HDRPMMEM
                 PRINTF_NEW(bless_header, header, header->nrefs);
 #endif
@@ -1665,7 +1665,7 @@ Ts_get_header(ts, off)
     PPCODE:
     mi = rpmtsInitIterator(ts, RPMDBI_PACKAGES, &off, sizeof(off));
     if ((header = rpmdbNextIterator(mi)) != NULL) {
-        mXPUSHs(sv_setref_pv(newSVpv("", 0), bless_header, headerLink(header)));
+        mXPUSHs(sv_setref_pv(newSVpvs(""), bless_header, headerLink(header)));
 #ifdef HDRPMMEM
         PRINTF_NEW(bless_header, header, header->nrefs);
 #endif
@@ -1809,7 +1809,7 @@ Ts_traverse_transaction(ts, callback, type = 0)
 #ifdef HDLISTDEBUG
             PRINTF_CALL;
 #endif
-            mXPUSHs(sv_setref_pv(newSVpv("", 0), "RPM4::Db::Te", Te));
+            mXPUSHs(sv_setref_pv(newSVpvs(""), "RPM4::Db::Te", Te));
             PUTBACK;
             call_sv(callback, G_DISCARD | G_SCALAR);
             SPAGAIN;
@@ -1896,7 +1896,7 @@ Ts__transpbs(ts)
     PPCODE:
     ps = rpmtsProblems(ts);
     if (ps && rpmpsNumProblems(ps)) /* if no problem, return undef */
-        mXPUSHs(sv_setref_pv(newSVpv("", 0), bless_rpmps, ps));
+        mXPUSHs(sv_setref_pv(newSVpvs(""), bless_rpmps, ps));
     
 int
 Ts_importpubkey(ts, filename)
@@ -2069,7 +2069,7 @@ Te_dep(Te, type)
     ds = rpmteDS(Te, tag);
     if (ds != NULL)
         if (rpmdsNext(ds) >= 0) {
-            mXPUSHs(sv_setref_pv(newSVpv("", 0), bless_rpmds, ds));
+            mXPUSHs(sv_setref_pv(newSVpvs(""), bless_rpmds, ds));
 #ifdef HDRPMMEM
             PRINTF_NEW(bless_rpmds, ds, ds->nrefs);
 #endif
@@ -2083,7 +2083,7 @@ Te_files(Te)
     PPCODE:
     Files = rpmteFI(Te);
     if ((Files = rpmfiInit(Files, 0)) != NULL && rpmfiNext(Files) >= 0) {
-        mXPUSHs(sv_setref_pv(newSVpv("", 0), bless_rpmfi, Files));
+        mXPUSHs(sv_setref_pv(newSVpvs(""), bless_rpmfi, Files));
 #ifdef HDRPMMEM
         PRINTF_NEW(bless_rpmfi, Files, Files->nrefs);
 #endif
@@ -2127,7 +2127,7 @@ rpmlibdep()
     if (Dep != NULL) {
         Dep = rpmdsInit(Dep);
         if (rpmdsNext(Dep) >= 0) {
-            mXPUSHs(sv_setref_pv(newSVpv("", 0), bless_rpmds, Dep));
+            mXPUSHs(sv_setref_pv(newSVpvs(""), bless_rpmds, Dep));
 #ifdef HDRPMMEM
             PRINTF_NEW(bless_rpmds, Dep, Dep->nrefs);
 #endif
@@ -2135,7 +2135,7 @@ rpmlibdep()
     }
 #else
     if (!rpmdsRpmlib(&Dep, NULL))
-        mXPUSHs(sv_setref_pv(newSVpv("", 0), bless_rpmds, Dep));
+        mXPUSHs(sv_setref_pv(newSVpvs(""), bless_rpmds, Dep));
 #endif
 
 void
@@ -2730,11 +2730,11 @@ Spec_srcheader(spec)
     PPCODE:
 #ifdef RPM4_9_0
     Header header = rpmSpecSourceHeader(spec);
-    mXPUSHs(sv_setref_pv(newSVpv("", 0), bless_header, (void *)headerLink(header)));
+    mXPUSHs(sv_setref_pv(newSVpvs(""), bless_header, (void *)headerLink(header)));
 #else
     if ( ! spec->sourceHeader) 
         initSourceHeader(spec);
-    mXPUSHs(sv_setref_pv(newSVpv("", 0), bless_header, (void *)headerLink(spec->sourceHeader)));
+    mXPUSHs(sv_setref_pv(newSVpvs(""), bless_header, (void *)headerLink(spec->sourceHeader)));
 #endif
 
 void
@@ -2746,10 +2746,10 @@ Spec_binheader(spec)
 #ifdef RPM4_9_0
     rpmSpecPkgIter iter = rpmSpecPkgIterInit(spec);
     while ((pkg = rpmSpecPkgIterNext(iter)) != NULL)
-        mXPUSHs(sv_setref_pv(newSVpv("", 0), bless_header, (void *)headerLink(rpmSpecPkgHeader(pkg))));
+        mXPUSHs(sv_setref_pv(newSVpvs(""), bless_header, (void *)headerLink(rpmSpecPkgHeader(pkg))));
 #else
     for (pkg = spec->packages; pkg != NULL; pkg = pkg->next)
-        mXPUSHs(sv_setref_pv(newSVpv("", 0), bless_header, (void *)headerLink(pkg->header)));
+        mXPUSHs(sv_setref_pv(newSVpvs(""), bless_header, (void *)headerLink(pkg->header)));
 #endif
  
 void
@@ -2845,7 +2845,7 @@ Spec_check(spec, ts = NULL)
 
     ps = rpmtsProblems(ts);
     if (ps && rpmpsNumProblems(ps)) /* if no problem, return undef */
-        mXPUSHs(sv_setref_pv(newSVpv("", 0), bless_rpmps, ps));
+        mXPUSHs(sv_setref_pv(newSVpvs(""), bless_rpmps, ps));
     ts = rpmtsFree(ts);
     SPAGAIN;
     
@@ -2979,7 +2979,7 @@ ps_new(perlclass, ts)
     PPCODE:
     ps = rpmtsProblems(ts);
     if (ps && rpmpsNumProblems(ps)) /* if no problem, return undef */
-        mXPUSHs(sv_setref_pv(newSVpv("", 0), bless_rpmps, ps));
+        mXPUSHs(sv_setref_pv(newSVpvs(""), bless_rpmps, ps));
  
 void
 ps_DESTROY(ps)
