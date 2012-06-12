@@ -1217,6 +1217,8 @@ Header_queryformat(h, query)
 void
 Header_fullname(h)
     Header h
+    ALIAS:
+       nevr= 1
     PREINIT:
     I32 gimme = GIMME_V;
     char *name;
@@ -1228,34 +1230,35 @@ Header_fullname(h)
         name = get_name(h, RPMTAG_NAME);
         version = get_name(h, RPMTAG_VERSION);
         release = get_name(h, RPMTAG_RELEASE);
-        arch = get_arch(h);
+        if (ix != 1)
+           arch = get_arch(h);
 
         if (gimme == G_SCALAR) {
+          if (ix == 1) {
+            mXPUSHs(newSVpvf("%s-%s-%s", name, version, release));
+          } else {
             mXPUSHs(newSVpvf("%s-%s-%s.%s",
                     name,
                     version,
                     release,
                     headerIsEntry(h, RPMTAG_SOURCERPM) ? arch : "src"
                     ));
+          }
         } else if (gimme == G_ARRAY) {
             EXTEND(SP, 4);
             PUSHs(sv_2mortal(newSVpv(name, 0)));
             PUSHs(sv_2mortal(newSVpv(version, 0)));
             PUSHs(sv_2mortal(newSVpv(release, 0)));
-            if (!headerIsEntry(h, RPMTAG_SOURCERPM)) {
-                PUSHs(sv_2mortal(newSVpv("src", 0)));
-            } else {
-                PUSHs(sv_2mortal(newSVpv(arch, 0)));
+            if (ix != 1) {
+              if (!headerIsEntry(h, RPMTAG_SOURCERPM)) {
+                  PUSHs(sv_2mortal(newSVpv("src", 0)));
+              } else {
+                  PUSHs(sv_2mortal(newSVpv(arch, 0)));
+              }
             }
         }
     }
 
-void
-Header_nevr(header)
-    Header header
-    PPCODE:
-    PUSHs(sv_2mortal(newSVpv(headerGetNEVR(header, NULL), 0)));
-    
 int
 Header_issrc(h)
     Header h
