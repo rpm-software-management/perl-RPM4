@@ -84,8 +84,6 @@
 #include <rpm/rpmlog.h>
 #include <rpm/rpmpgp.h>
 #include <rpm/rpmtag.h>
-#define _RPM_4_4_COMPAT
-#include <rpm/rpmlegacy.h>
 
 #ifdef HAVE_RPMCONSTANT
 #include <rpmconstant/rpmconstant.h>
