@@ -1090,7 +1090,7 @@ Header_listtag(h)
     PPCODE:
     iterator = headerInitIterator(h);
     while (headerNext(iterator, &td)) {
-        mXPUSHs(newSViv(td.tag));
+        mXPUSHs(newSViv(rpmtdTag(&td)));
         rpmtdFreeData(&td);
     }
     rpmtdFreeData(&td);
@@ -1131,7 +1131,7 @@ Header_tag(h, sv_tag)
     if (tag > 0) {
         struct rpmtd_s val;
         if (headerGet(h, tag, &val, HEADERGET_DEFAULT)) {
-            int type = val.type;
+            int type = rpmtdType(&val);
             int n = rpmtdCount(&val);
 
             switch(type) {
@@ -1195,7 +1195,7 @@ Header_tagtype(h, sv_tag)
     RETVAL = RPM_NULL_TYPE;
     if (tag > 0)
         if (headerGet(h, tag, &td, HEADERGET_DEFAULT))
-            RETVAL = td.type;
+            RETVAL = rpmtdType(&td);
     rpmtdFreeData(&td);
     OUTPUT:
     RETVAL
