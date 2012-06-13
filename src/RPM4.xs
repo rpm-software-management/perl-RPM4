@@ -1142,15 +1142,12 @@ Header_tag(h, sv_tag)
                         EXTEND(SP, n);
                         rpmtdInit(&val);
         
-                        for (i = 0; i < n; i++) {
+                        for (i = 0; i < n; i++)
                             mPUSHs(newSVpv(rpmtdNextString(&val), 0));
-                        }
                     }
                 break;
-                case RPM_STRING_TYPE: {
-                    char *name = (char *) rpmtdGetString(&val);
-                    mPUSHs(newSVpv(name, 0));
-                };
+                case RPM_STRING_TYPE:
+                    mPUSHs(newSVpv(rpmtdGetString(&val), 0));
                 break;
                 case RPM_CHAR_TYPE:
                 case RPM_INT8_TYPE:
