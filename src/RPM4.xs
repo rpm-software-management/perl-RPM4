@@ -1143,13 +1143,13 @@ Header_tag(h, sv_tag)
                         rpmtdInit(&val);
         
                         for (i = 0; i < n; i++) {
-                            PUSHs(sv_2mortal(newSVpv(rpmtdNextString(&val), 0)));
+                            mPUSHs(newSVpv(rpmtdNextString(&val), 0));
                         }
                     }
                 break;
                 case RPM_STRING_TYPE: {
                     char *name = (char *) rpmtdGetString(&val);
-                    PUSHs(sv_2mortal(newSVpv(name, 0)));
+                    mPUSHs(newSVpv(name, 0));
                 };
                 break;
                 case RPM_CHAR_TYPE:
@@ -1164,13 +1164,13 @@ Header_tag(h, sv_tag)
 
                         for (i = 0; i < n; i++) {
                             rpmtdNext(&val);
-                            PUSHs(sv_2mortal(newSViv(rpmtdGetNumber(&val))));
+                            mPUSHs(newSViv(rpmtdGetNumber(&val)));
                         }
                     }
                 break;
                 case RPM_BIN_TYPE:
                     /* XXX HACK ALERT: element field abused as no. bytes of binary data. */
-                    PUSHs(sv_2mortal(newSVpv((char *)val.data, val.count)));
+                    mPUSHs(newSVpv((char *)val.data, val.count));
                 break;
                 default:
                     croak("unknown rpm tag type %d", type);
@@ -1244,14 +1244,14 @@ Header_fullname(h)
           }
         } else if (gimme == G_ARRAY) {
             EXTEND(SP, 4);
-            PUSHs(sv_2mortal(newSVpv(name, 0)));
-            PUSHs(sv_2mortal(newSVpv(version, 0)));
-            PUSHs(sv_2mortal(newSVpv(release, 0)));
+            mPUSHs(newSVpv(name, 0));
+            mPUSHs(newSVpv(version, 0));
+            mPUSHs(newSVpv(release, 0));
             if (ix != 1) {
               if (!headerIsEntry(h, RPMTAG_SOURCERPM)) {
-                  PUSHs(sv_2mortal(newSVpv("src", 0)));
+                  mPUSHs(newSVpv("src", 0));
               } else {
-                  PUSHs(sv_2mortal(newSVpv(arch, 0)));
+                  mPUSHs(newSVpv(arch, 0));
               }
             }
         }
