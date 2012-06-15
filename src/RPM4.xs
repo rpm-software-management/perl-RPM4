@@ -2745,6 +2745,8 @@ Spec_srcrpm(spec)
 #else   
     header = spec->packages->header;
 #endif
+    struct rpmtd_s td;
+    int no_src = headerGet(header, RPMTAG_NOPATCH, &td, HEADERGET_MINMEM) || headerGet(header, RPMTAG_NOSOURCE, &td, HEADERGET_MINMEM);
     name = get_name(header, RPMTAG_NAME);
     version = get_name(header, RPMTAG_VERSION);
     release = get_name(header, RPMTAG_RELEASE);
@@ -2752,8 +2754,7 @@ Spec_srcrpm(spec)
     mXPUSHs(newSVpvf("%s/%s-%s-%s.%ssrc.rpm",
         rpmGetPath("%{_srcrpmdir}", NULL),
         name, version, release,
-	// FIXME: we basically want genSourceRpmName() which is internal :-(
-        "" //spec->noSource ? "no" : ""
+        no_src ? "no" : ""
         ));
 
 void
