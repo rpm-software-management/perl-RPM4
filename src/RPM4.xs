@@ -768,16 +768,6 @@ archscore(arch, build = 0)
     OUTPUT:
     RETVAL
     
-int
-platformscore(platform)
-    const char * platform
-    PREINIT:
-    CODE:
-    RETVAL=0;
-    croak("platformscore exists only from rpm 4.4.8; unused anyway");
-    OUTPUT:
-    RETVAL
-
 void
 buildhost()
     PREINIT:
