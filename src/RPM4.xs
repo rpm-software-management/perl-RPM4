@@ -745,26 +745,19 @@ getarchname()
     mXPUSHs(newSVpv(v, 0));
 
 int
-osscore(os, build = 0)
-    char * os
+osscore(data, build = 0)
+    char * data;
     int build;
+    ALIAS:
+        archscore = 1
     PREINIT:
     int machtable;
     CODE:
-    machtable = build ? RPM_MACHTABLE_BUILDOS : RPM_MACHTABLE_INSTOS;
-    RETVAL = rpmMachineScore(machtable, os);
-    OUTPUT:
-    RETVAL
-
-int
-archscore(arch, build = 0)
-    char * arch
-    int build;
-    PREINIT:
-    int machtable;
-    CODE:
-    machtable = build ? RPM_MACHTABLE_BUILDARCH : RPM_MACHTABLE_INSTARCH;
-    RETVAL = rpmMachineScore(machtable, arch);
+    if (ix == 0)
+         machtable = build ? RPM_MACHTABLE_BUILDOS   : RPM_MACHTABLE_INSTOS;
+    else
+         machtable = build ? RPM_MACHTABLE_BUILDARCH : RPM_MACHTABLE_INSTARCH;
+    RETVAL = rpmMachineScore(machtable, data);
     OUTPUT:
     RETVAL
     
