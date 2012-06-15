@@ -1219,7 +1219,7 @@ Header_fullname(h)
                     name,
                     version,
                     release,
-                    headerIsEntry(h, RPMTAG_SOURCERPM) ? arch : "src"
+                    arch
                     ));
           }
         } else if (gimme == G_ARRAY) {
@@ -1227,13 +1227,7 @@ Header_fullname(h)
             mPUSHs(newSVpv(name, 0));
             mPUSHs(newSVpv(version, 0));
             mPUSHs(newSVpv(release, 0));
-            if (ix != 1) {
-              if (!headerIsEntry(h, RPMTAG_SOURCERPM)) {
-                  mPUSHs(newSVpv("src", 0));
-              } else {
-                  mPUSHs(newSVpv(arch, 0));
-              }
-            }
+            mPUSHs(newSVpv(arch, 0));
         }
     }
 
