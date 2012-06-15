@@ -388,9 +388,7 @@ void _newdep(SV * sv_deptag, char * name, SV * sv_sense, SV * sv_evr) {
         sense = sv2sens(sv_sense);
     if (sv_evr && SvOK(sv_evr))
         evr = SvPV_nolen(sv_evr);
-    Dep = rpmdsSingle(deptag, 
-        name,
-        evr ? evr : "", sense);
+    Dep = rpmdsSingle(deptag, name, evr ? evr : "", sense);
     if (Dep) {
         mXPUSHs(sv_setref_pv(newSVpvs(""), bless_rpmds, Dep));
     }
@@ -2344,8 +2342,7 @@ Dep_add(Dep, name,  sv_sense = NULL, sv_evr = NULL)
         sense = sv2sens(sv_sense);
     if (sv_evr && SvOK(sv_evr))
         evr = SvPV_nolen(sv_evr);
-    Deptoadd = rpmdsSingle(rpmdsTagN(Dep), name,
-         evr ? evr : "", sense);
+    Deptoadd = rpmdsSingle(rpmdsTagN(Dep), name, evr ? evr : "", sense);
     if (Deptoadd) {
         rpmdsMerge(&Dep, Deptoadd);
         Deptoadd = rpmdsFree(Deptoadd);
@@ -2730,9 +2727,7 @@ Spec_srcrpm(spec)
     char *nvr = headerGetAsString(header, RPMTAG_NVR);
     mXPUSHs(newSVpvf("%s/%s.%ssrc.rpm",
         rpmGetPath("%{_srcrpmdir}", NULL),
-        nvr,
-        no_src ? "no" : ""
-        ));
+        nvr, no_src ? "no" : ""));
 
 void
 Spec_binrpm(spec)
