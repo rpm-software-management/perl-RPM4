@@ -1,6 +1,7 @@
 Version 0.29 - 12 June 2012
 
 - functions that not are implemented since switching to rpm-4.6 now die
+- internal cleanups
 - srcrpm(): fix returning "...nosrc.rpm" instead of "...src.rpm" when needed
   (it always returned "...src.rpm" since rpm-4.9+)
 - use rpm-4.6+ API, not rpm-4.4 compatibility one

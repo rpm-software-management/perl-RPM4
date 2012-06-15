@@ -1199,35 +1199,22 @@ Header_fullname(h)
        nevr= 1
     PREINIT:
     I32 gimme = GIMME_V;
-    char *name;
-    char *version;
-    char *release;
-    char *arch;
     PPCODE:
     if (h) {
-        name = get_name(h, RPMTAG_NAME);
-        version = get_name(h, RPMTAG_VERSION);
-        release = get_name(h, RPMTAG_RELEASE);
-        if (ix != 1)
-           arch = get_arch(h);
-
         if (gimme == G_SCALAR) {
+          char *nvr = headerGetAsString(h, RPMTAG_NVR);
           if (ix == 1) {
-            mXPUSHs(newSVpvf("%s-%s-%s", name, version, release));
+            mXPUSHs(newSVpv(nvr, 0));
           } else {
-            mXPUSHs(newSVpvf("%s-%s-%s.%s",
-                    name,
-                    version,
-                    release,
-                    arch
-                    ));
+            mXPUSHs(newSVpvf("%s.%s", nvr, get_arch(h)));
           }
+          free(nvr);
         } else if (gimme == G_ARRAY) {
             EXTEND(SP, 4);
-            mPUSHs(newSVpv(name, 0));
-            mPUSHs(newSVpv(version, 0));
-            mPUSHs(newSVpv(release, 0));
-            mPUSHs(newSVpv(arch, 0));
+            mPUSHs(newSVpv(get_name(h, RPMTAG_NAME), 0));
+            mPUSHs(newSVpv(get_name(h, RPMTAG_VERSION), 0));
+            mPUSHs(newSVpv(get_name(h, RPMTAG_RELEASE), 0));
+            mPUSHs(newSVpv(get_arch(h), 0));
         }
     }
 
@@ -2731,7 +2718,6 @@ void
 Spec_srcrpm(spec)
     rpmSpec spec
     PREINIT:
-    const char *name, *version, *release;
     Header header = NULL;
     PPCODE:
 #ifdef RPM4_9_0
@@ -2741,13 +2727,10 @@ Spec_srcrpm(spec)
 #endif
     struct rpmtd_s td;
     int no_src = headerGet(header, RPMTAG_NOPATCH, &td, HEADERGET_MINMEM) || headerGet(header, RPMTAG_NOSOURCE, &td, HEADERGET_MINMEM);
-    name = get_name(header, RPMTAG_NAME);
-    version = get_name(header, RPMTAG_VERSION);
-    release = get_name(header, RPMTAG_RELEASE);
-
-    mXPUSHs(newSVpvf("%s/%s-%s-%s.%ssrc.rpm",
+    char *nvr = headerGetAsString(header, RPMTAG_NVR);
+    mXPUSHs(newSVpvf("%s/%s.%ssrc.rpm",
         rpmGetPath("%{_srcrpmdir}", NULL),
-        name, version, release,
+        nvr,
         no_src ? "no" : ""
         ));
 
