@@ -1517,7 +1517,7 @@ Ts_traverse(ts, callback = NULL, sv_tagname = NULL, sv_tagvalue = NULL, keylen =
     SV * sv_exclude
     int keylen
     PREINIT:
-    rpmTag tag;
+    rpmDbiTagVal tag;
     void * value = NULL;
     rpmdbMatchIterator mi;
     Header header;
