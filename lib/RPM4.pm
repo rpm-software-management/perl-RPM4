@@ -420,40 +420,6 @@ Returns 0 on success.
 Create a RPM4::Header::Dependencies object about rpmlib
 internals provides
 
-=head2 rpmsysinfodep($file)
-
-Return a RPM4::Header::Dependencies object about sysinfo file,
-$file is an optionnal file to, default depend of rpm.
-
-Since rpm 4.3.3, return undef on older version
-
-=head2 rpmgetconfdep($path)
-
-Return a RPM4::Header::Dependencies object about getconf,
-$path is an optionnal path to use, default is /.
-
-Since rpm 4.3.3, return undef on older version
-
-=head2 rpmcpuinfodep($file)
-
-Return a RPM4::Header::Dependencies object about cpuinfo,
-$file is an optionnal file to use, default is /proc/cpuinfo.
-
-Since rpm 4.3.3, return undef on older version
-
-=head2 rpmunamedep
-
-Return a RPM4::Header::Dependencies object from uname().
-
-Since rpm 4.3.3, return undef on older version
-
-=head2 rpmpipedep($cmd)
-
-Return a RPM4::Header::Dependencies from a command using.
-(It use a pipe internally). $cmd is the command to use.
-
-Since rpm 4.3.3, return undef on older version
-
 =head1 SEE ALSO
 
 L<rpm(8)>,

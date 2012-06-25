@@ -1,3 +1,5 @@
+- drop rpm5 functions: rpmsysinfodep, rpmgetconfdep, rpmcpuinfodep, rpmpipedep
+  & rpmunamedep (unimplemented for 4 years...)
 - new spec:
   o fix forcing 'noarch_check' & 'force' parameters
   o drop unused 'cookie', 'passphrase', 'rootdir' & 'verify' parameters (useless with rpm-4.9.x anyway)

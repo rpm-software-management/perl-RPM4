@@ -2082,40 +2082,6 @@ rpmlibdep()
         mXPUSHs(sv_setref_pv(newSVpvs(""), bless_rpmds, Dep));
 #endif
 
-void
-rpmsysinfodep(sysinfofile = NULL)
-    char * sysinfofile
-    PREINIT:
-    PPCODE:
-    croak("rpmsysinfodep exists only in rpm5; unused anyway");
-
-void
-rpmgetconfdep(path = NULL)
-    char * path
-    PREINIT:
-    PPCODE:
-    croak("rpmgetconfdep exists only in rpm5; unused anyway");
-
-void
-rpmcpuinfodep(path = NULL)
-    char * path
-    PREINIT:
-    PPCODE:
-    croak("rpmcpuinfodep exists only in rpm5; unused anyway");
-
-void
-rpmunamedep()
-    PREINIT:
-    PPCODE:
-    croak("rpmunamedep exists only in rpm5; unused anyway");
-
-void
-rpmpipedep(cmd, tag = 0)
-    char * cmd
-    int tag
-    PREINIT:
-    PPCODE:
-    
 MODULE = RPM4 	PACKAGE = RPM4::Header::Dependencies  PREFIX = Dep_
 
 void
