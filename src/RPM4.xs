@@ -1541,15 +1541,12 @@ Ts_traverse(ts, callback = NULL, sv_tagname = NULL, sv_tagvalue = NULL, keylen =
         tag = sv2dbquerytag(sv_tagname);
     }
     if (sv_tagvalue != NULL && SvOK(sv_tagvalue)) {
-        switch (tag) {
-            case RPMDBI_PACKAGES:
+        if (tag == RPMDBI_PACKAGES) {
                 i = SvIV(sv_tagvalue);
                 value = &i;
                 keylen = sizeof(i);
-            break;
-            default:
+        } else {
                 value = (void *) SvPV_nolen(sv_tagvalue);
-            break;
         }
     }
     
