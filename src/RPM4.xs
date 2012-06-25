@@ -396,35 +396,17 @@ void _newdep(SV * sv_deptag, char * name, SV * sv_sense, SV * sv_evr) {
 }
 
 /* Get a new specfile */
-void _newspec(rpmts ts, char * filename, SV * svpassphrase, SV * svrootdir, SV * svcookies, SV * svanyarch, SV * svforce, SV * svverify) {
+void _newspec(rpmts ts, char * filename, SV * svanyarch, SV * svforce) {
     rpmSpec spec = NULL;
-    char * passphrase = NULL;
-    char * rootdir = NULL;
-    char * cookies = NULL;
     int anyarch = 0;
     int force = 0;
-    int verify = 0;
     dSP;
-
-    if (svpassphrase && SvOK(svpassphrase))
-        passphrase = SvPV_nolen(svpassphrase);
-    
-    if (svrootdir && SvOK(svrootdir))
-	rootdir = SvPV_nolen(svrootdir);
-    else
-	rootdir = "/";
-    
-    if (svcookies && SvOK(svcookies))
-	cookies = SvPV_nolen(svcookies);
 
     if (svanyarch && SvOK(svanyarch))
 	anyarch = SvIV(svanyarch);
     
     if (svforce && SvOK(svforce))
 	force = SvIV(svforce);
-    
-    if (svverify && SvOK(svverify))
-	verify = SvIV(svverify);
     
     if (filename) {
 #ifdef RPM4_9_0
@@ -435,7 +417,7 @@ void _newspec(rpmts ts, char * filename, SV * svpassphrase, SV * svrootdir, SV *
              flags |= RPMSPEC_FORCE;
         spec = rpmSpecParse(filename, flags, NULL);
 #else
-	if (!parseSpec(ts, filename, rootdir, NULL ,0, passphrase, cookies, anyarch, force))
+	if (!parseSpec(ts, filename, "/", NULL ,0, NULL, NULL, anyarch, force))
             spec = rpmtsSetSpec(ts, NULL);
 #endif
 #ifdef HHACK
@@ -2602,19 +2584,15 @@ Files_nlink(Files)
 MODULE = RPM4     PACKAGE = RPM4
 
 void
-newspec(filename = NULL, passphrase = NULL, rootdir = NULL, cookies = NULL, anyarch = NULL, force = NULL, verify = NULL)
+newspec(filename = NULL, anyarch = NULL, force = NULL)
     char * filename 
-    SV * passphrase
-    SV * rootdir
-    SV * cookies
     SV * anyarch
     SV * force
-    SV * verify
     PREINIT:
     rpmts ts = rpmtsCreate();
     PPCODE:
     PUTBACK;
-    _newspec(ts, filename, passphrase, rootdir, cookies, anyarch, force, verify);
+    _newspec(ts, filename, anyarch, force);
     ts = rpmtsFree(ts);
     SPAGAIN;
 
@@ -2626,12 +2604,8 @@ Spec_new(perlclass, specfile = NULL, ...)
     char * specfile
     PREINIT:
     rpmts ts = NULL;
-    SV * passphrase = NULL;
-    SV * rootdir = NULL;
-    SV * cookies = NULL;
     SV * anyarch = 0;
     SV * force = 0;
-    SV * verify = 0;
     int i;
     PPCODE:
     for(i=2; i < items; i++) {
@@ -2651,18 +2625,9 @@ Spec_new(perlclass, specfile = NULL, ...)
         } else if (strcmp(SvPV_nolen(ST(i)), "force") == 0) {
             i++;
             force = ST(i);
-        } else if (strcmp(SvPV_nolen(ST(i)), "verify") == 0) {
-            i++;
-            verify = ST(i);
         } else if (strcmp(SvPV_nolen(ST(i)), "anyarch") == 0) {
             i++;
             anyarch = ST(i);
-        } else if (strcmp(SvPV_nolen(ST(i)), "passphrase") == 0) {
-            i++;
-            passphrase = ST(i);
-        } else if (strcmp(SvPV_nolen(ST(i)), "root") == 0) {
-            i++;
-            rootdir = ST(i);
         } else {
             warn("Unknown value in " bless_spec "->new, ignored");
             i++;
@@ -2671,7 +2636,7 @@ Spec_new(perlclass, specfile = NULL, ...)
     if (!ts)
         ts = rpmtsCreate();
     PUTBACK;
-    _newspec(ts, specfile, passphrase, rootdir, cookies, anyarch, force, verify);
+    _newspec(ts, specfile, anyarch, force);
     SPAGAIN;
     ts = rpmtsFree(ts);
     

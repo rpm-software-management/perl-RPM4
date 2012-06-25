@@ -11,8 +11,6 @@ my %info = RPM4::moduleinfo();
 my $testdir = tempdir( CLEANUP => 1 );
 mkdir("$testdir/$_") foreach (qw(BUILD RPMS RPMS/noarch SRPMS));
 
-my $passphrase = "RPM4";
-
 RPM4::add_macro("_tmppath $testdir");
 RPM4::add_macro("_builddir $testdir");
 RPM4::add_macro("_topdir $testdir");
@@ -31,7 +29,7 @@ if ($info{Hack} eq "Yes") {
     ok(! defined(RPM4::Spec->new()), "Create an empty spec object don't works");
 }
 ok(!defined($spec = RPM4::Spec->new("$Bin/test-rpm-1.0-1mdk.noarch.rpm")), "Loading a bad spec file");
-ok($spec = RPM4::Spec->new("$Bin/test-rpm.spec", passphrase => $passphrase), "Loading a spec file");
+ok($spec = RPM4::Spec->new("$Bin/test-rpm.spec"), "Loading a spec file");
 
 my @rpms = $spec->binrpm;
 ok(@rpms == 1, "Can find binary package");

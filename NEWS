@@ -1,5 +1,6 @@
 - new spec:
   o fix forcing 'noarch_check' & 'force' parameters
+  o drop unused 'cookie', 'passphrase', 'rootdir' & 'verify' parameters (useless with rpm-4.9.x anyway)
 
 Version 0.30 - 15 June 2012
 
