@@ -3,6 +3,7 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include "rpmversion.h"
 
 #undef Fflush
 #undef Mkdir
