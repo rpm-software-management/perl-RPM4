@@ -491,7 +491,7 @@ int _header_vs_dep(Header h, rpmds dep, int nopromote) {
 }
 
 int _headername_vs_dep(Header h, rpmds dep, int nopromote) {
-    char *name; rpm_tagtype_t type;
+    char *name;
     int rc = 0;
     CHECK_RPMDS_IX(dep);
     struct rpmtd_s val;
@@ -2072,14 +2072,14 @@ void
 rpmlibdep()
     PREINIT:
     rpmds Dep = NULL;
+    PPCODE:
+#if 0
     rpmds next;
     const char ** provNames;
     int * provFlags;
     const char ** provVersions;
     int num = 0;
     int i;
-    PPCODE:
-#if 0
     num = rpmGetRpmlibProvides(&provNames, &provFlags, &provVersions);
     for (i = 0; i < num; i++) {
 #ifdef HDLISTDEBUG
@@ -2888,11 +2888,11 @@ void
 Spec_icon(spec)
     rpmSpec spec
     PREINIT:
-    Package pkg;
     PPCODE:
 #ifdef RPM4_9_0
     croak("icon exists only in rpm < 4.9; unused anyway");
 #else
+    Package pkg;
     for (pkg = spec->packages; pkg != NULL; pkg = pkg->next) {
         char * dest = NULL;
         int len;
@@ -2909,11 +2909,11 @@ void
 Spec_icon_url(spec)
     rpmSpec spec
     PREINIT:
-    Package pkg;
     PPCODE:
 #ifdef RPM4_9_0
     croak("icon_url exists only in rpm < 4.9; unused anyway; unused anyway");
 #else
+    Package pkg;
     for (pkg = spec->packages; pkg != NULL; pkg = pkg->next) {
         char * dest = NULL;
         int len;
