@@ -1,3 +1,6 @@
+- new spec:
+  o fix forcing 'noarch_check' & 'force' parameters
+
 Version 0.30 - 15 June 2012
 
 - functions that not are implemented since switching to rpm-4.6 now die
