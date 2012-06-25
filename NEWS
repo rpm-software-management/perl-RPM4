@@ -1,3 +1,5 @@
+Version 0.31 - 25 June 2012
+
 - drop rpm5 functions: rpmsysinfodep, rpmgetconfdep, rpmcpuinfodep, rpmpipedep
   & rpmunamedep (unimplemented for 4 years...)
 - new spec:
