@@ -72,7 +72,7 @@ rpmconstanttbl.c: Makefile rpmh2tbl
 RPMCONSTTBL
 	# This code is to reduce duplication of files
 	# in fact it is only usefull for the maintainers of this module
-	# if you get the module from CPAN, those files are allready here
+	# if you get the module from CPAN, those files are already here
 	# if you're building from svn, you need rpmconstant directory
 	my $second = "copyrpmconstant: " . join(" ", @rpmconstantfiles) ."\n\n";
 	if(-d '../../rpmconstant') {
