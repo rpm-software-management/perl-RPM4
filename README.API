@@ -1,11 +1,11 @@
 The following packages require perl-RPM4:
 
 (1) iurt
-(2) perl-MDV-Repsys
-(3) perl-Youri-Package-RPM-Builder
+(2) perl-MDV-Repsys [NOT PACKAGED]
+(3) perl-Youri-Package-RPM-Builder [NOT PACKAGED]
 (4) perl-Youri-Package-RPM-Updater
 (5) perl-Youri-Package
-(6) mga-youri-core
+(6) mga-youri-submit
 
 notes:
 - (5) doesn't use proposes both Youri::Package::URPM and
