@@ -8,8 +8,6 @@
 
 /* Hdlistsign.c: imported but modified functions */
 
-int rpmsign(char *passphrase, const char *rpm);
-
 int rpmchecksig(rpmts ts, const char * filename, int flags);
 
 /* rpmlib does not export some usefull functions

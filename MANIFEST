@@ -5,7 +5,6 @@ ChangeLog
 src/Makefile.PL
 src/RPM4.h
 src/RPM4.xs
-src/RPM4sign.c
 src/rpmconstant.c
 src/rpmconstant.h
 src/rpmconstant_internal.c

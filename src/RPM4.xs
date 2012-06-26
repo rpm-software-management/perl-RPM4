@@ -84,6 +84,10 @@
 #include <rpm/rpmlog.h>
 #include <rpm/rpmpgp.h>
 #include <rpm/rpmtag.h>
+#include <rpm/rpmcli.h>
+#ifdef RPM4_9_0
+#include <rpm/rpmsign.h>
+#endif
 
 #ifdef HAVE_RPMCONSTANT
 #include <rpmconstant/rpmconstant.h>
@@ -487,6 +491,23 @@ int _headername_vs_dep(Header h, rpmds dep, int nopromote) {
     rpmtdFreeData(&val);
     return rc;
     /* return 1 if match */
+}
+
+/* Hight level function */
+int rpmsign(char *passphrase, const char *rpm) {
+#ifdef RPM4_9_0
+    return rpmPkgSign(rpm, NULL, passphrase);
+#else
+    QVA_t qva = &rpmQVKArgs;
+    ARGV_t file = NULL;
+
+    argvAdd(&file, rpm);
+
+    qva->qva_mode = RPMSIGN_ADD_SIGNATURE;
+    qva->passPhrase = passphrase;
+    
+    return rpmcliSign(NULL, qva, file);
+#endif
 }
 
 MODULE = RPM4 PACKAGE = RPM4

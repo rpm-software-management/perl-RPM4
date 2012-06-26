@@ -87,7 +87,7 @@ RPMCONSTTBL
 WriteMakefile(
     NAME         => 'RPM4',
     VERSION_FROM => '../lib/RPM4.pm',
-    OBJECT       => "RPM4.o RPM4sign.o $obj",
+    OBJECT       => "RPM4.o $obj",
     INC	         => "-I$rpmheaderlocation",
     LIBS         => "-lrpmsign -lrpm -lrpmio -lrpmbuild -lpopt -lz -lbz2 $ldd",
     'CCFLAGS'    => "-Wall $fl",
