@@ -11,7 +11,7 @@ $rpm_version ge 4.8.0
 Unable to build RPM4 with too old (or undetected) rpm version $rpm_version
 BARF
 
-sub MY::postamble {
+sub MY::postamble() {
     <<MAKECHANGELOG;
 .PHONY: ChangeLog copyrpmconstant
 

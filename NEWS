@@ -1,4 +1,5 @@
 - fix srcrpm()
+- fix --rpmversion (broken for 6+ years...)
 
 Version 0.31 - 25 June 2012
 
