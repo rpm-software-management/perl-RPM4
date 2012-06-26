@@ -74,9 +74,9 @@ RPMCONSTTBL
 	# if you're building from svn, you need rpmconstant directory
 	my $second = "copyrpmconstant: " . join(" ", @rpmconstantfiles) . "\n\n";
 	if (-d '../../rpmconstant') {
-        foreach (@rpmconstantfiles) {
-            $second .= "$_: ../../rpmconstant/$_\n\tcp -a \$< \$@\n\n";
-        }
+            foreach (@rpmconstantfiles) {
+                $second .= "$_: ../../rpmconstant/$_\n\tcp -a \$< \$@\n\n";
+            }
 	}
 
 	$first . $second;
