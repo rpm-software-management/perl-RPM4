@@ -1,3 +1,4 @@
+- drop support for repackage (not working anymore since rpm-4.6)
 - fix srcrpm()
 - fix --rpmversion (broken for 6+ years...)
 

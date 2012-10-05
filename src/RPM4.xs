@@ -276,15 +276,6 @@ static void *
         case RPMCALLBACK_UNINST_STOP:
             s_what = "UNINST_STOP";
         break;
-        case RPMCALLBACK_REPACKAGE_PROGRESS:
-            s_what = "REPACKAGE_PROGRESS";
-        break;
-        case RPMCALLBACK_REPACKAGE_START:
-            s_what = "REPACKAGE_START";
-        break;
-        case RPMCALLBACK_REPACKAGE_STOP:
-            s_what = "REPACKAGE_STOP";
-        break;
         case RPMCALLBACK_UNPACK_ERROR:
             s_what = "UNPACKAGE_ERROR";
         break;
@@ -1481,9 +1472,6 @@ Ts_transflag(ts, sv_transflag = NULL)
     CODE:
     if (sv_transflag != NULL) {
         transflags = sv2transflags(sv_transflag);
-        /* Take care to rpm config (userland) */
-        if (rpmExpandNumeric("%{?_repackage_all_erasures}"))
-            transflags |= RPMTRANS_FLAG_REPACKAGE;
         RETVAL = rpmtsSetFlags(ts, transflags);
     } else {
         RETVAL = rpmtsFlags(ts);
