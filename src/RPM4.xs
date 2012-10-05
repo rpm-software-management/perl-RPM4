@@ -2677,7 +2677,7 @@ Spec_srcrpm(spec)
     header = spec->packages->header;
 #endif
     struct rpmtd_s td;
-    int no_src = headerGet(header, RPMTAG_NOPATCH, &td, HEADERGET_MINMEM) || headerGet(header, RPMTAG_NOSOURCE, &td, HEADERGET_MINMEM);
+    int no_src = headerGet(header, RPMTAG_NOSOURCE, &td, HEADERGET_MINMEM);
     char *nvr = headerGetAsString(header, RPMTAG_NVR);
     mXPUSHs(newSVpvf("%s/%s.%ssrc.rpm",
         rpmGetPath("%{_srcrpmdir}", NULL),
