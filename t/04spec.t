@@ -9,8 +9,8 @@ use RPM4;
 
 my %info = RPM4::moduleinfo();
 
-my $testdir = tempdir( CLEANUP => 1 );
-mkdir("$testdir/$_") foreach (qw(BUILD RPMS RPMS/noarch SRPMS));
+my $testdir = tempdir(CLEANUP => 1);
+mkdir("$testdir/$_") foreach qw(BUILD RPMS RPMS/noarch SRPMS);
 
 RPM4::add_macro("_tmppath $testdir");
 RPM4::add_macro("_builddir $testdir");
@@ -25,9 +25,9 @@ ok(!RPM4::installsrpm("$Bin/test-rpm-1.0-1mdk.noarch.rpm"), "installsrpms works"
 
 my $spec;
 if ($info{Hack} eq "Yes") {
-    ok( defined(RPM4::Spec->new()), "Create an empty spec object");
+    ok(defined(RPM4::Spec->new), "Create an empty spec object");
 } else {
-    ok(! defined(RPM4::Spec->new()), "Create an empty spec object don't works");
+    ok(! defined(RPM4::Spec->new), "Create an empty spec object don't works");
 }
 ok(!defined($spec = RPM4::Spec->new("$Bin/test-rpm-1.0-1mdk.noarch.rpm")), "Loading a bad spec file");
 ok($spec = RPM4::Spec->new("$Bin/test-rpm.spec"), "Loading a spec file");
@@ -38,10 +38,10 @@ ok($rpms[0] =~ m!noarch/test-rpm-1.0-1mdk.noarch.rpm$!, "binrpm return good valu
 
 ok($spec->srcrpm =~ m!SRPMS/test-rpm-1.0-1mdk.src.rpm$!, "srcrpm return good value");
 
-ok(!defined($spec->check()), "Running spec::check");
+ok(!defined($spec->check), "Running spec::check");
 
 my $h;
-ok(defined($h = $spec->srcheader()), "Geting source header before build");
+ok(defined($h = $spec->srcheader), "Geting source header before build");
 ok($h->queryformat("%{NAME}") eq "test-rpm", "can querying header give by spec");
 
 ok($spec->build([ qw(PREP) ]) == 0, "simulate rpm -bp (check prep)");
@@ -53,11 +53,11 @@ ok($spec->build([ qw(PACKAGESOURCE) ]) == 0, "simulate rpm -bs");
 #ok($spec->rpmbuild("bb") == 0, "testing spec->rpmbuild(-bb)");
 ok($spec->build([ qw(RMBUILD RMSOURCE) ]) == 0, "simulate cleaning spec, source, build");
 
-ok(defined($h = $spec->srcheader()), "Geting source header after build");
+ok(defined($h = $spec->srcheader), "Geting source header after build");
 ok($h->queryformat("%{NAME}") eq "test-rpm", "can querying header give by spec");
 is($h->tag("URL"), "http://rpm4.zarb.org/", "can get url give by spec");
 
-my ($bh) = $spec->binheader();
+my ($bh) = $spec->binheader;
 ok(defined($bh), "Can get binary header from spec");
 ok($bh->queryformat("%{NAME}") eq "test-rpm", "can querying header give by spec");
 

@@ -52,7 +52,7 @@ bootstrap RPM4;
 # I18N:
 sub N {
     my ($msg, @args) = @_;
-    sprintf($msg, @args)
+    sprintf($msg, @args);
 }
 
 sub compare_evr {
@@ -60,18 +60,18 @@ sub compare_evr {
     my ($be, $bv, $br) = $_[1] =~ /^(?:([^:]*):)?([^-]*)(?:-(.*))?$/;
 
     my $rc = 0;
-    if(defined($ae) && ! defined($be)) {
+    if (defined($ae) && ! defined($be)) {
         return 1;
-    } elsif(!defined($ae) && defined($be)) {
+    } elsif (!defined($ae) && defined($be)) {
         return -1;
     } else {
-        $rc = RPM4::rpmvercmp($ae, $be) if (defined($ae) && defined($be));
+        $rc = RPM4::rpmvercmp($ae, $be) if defined($ae) && defined($be);
         if ($rc == 0) {
             $rc = RPM4::rpmvercmp($av, $bv);
             if ($rc == 0) {
-                if(defined($ar) && !defined($br)) {
+                if (defined($ar) && !defined($br)) {
                     return 1;
-                } elsif(!defined($ar) && defined($br)) {
+                } elsif (!defined($ar) && defined($br)) {
                     return -1;
                 } elsif (!defined($ar) &&  !defined($br)) {
                     return 0;
@@ -116,64 +116,64 @@ sub format_rpmpb {
     my @ret;
     foreach my $p (@msgs) {
         $p->{pb} eq "BADARCH" and do {
-            push @ret, N('package %s is intended for a different architecture', $p->{pkg});
+            push @ret, N("package %s is intended for a different architecture", $p->{pkg});
             next;
         };
         $p->{pb} eq "BADOS" and do {
-            push @ret, N('package %s is intended for a different operating system', $p->{pkg});
+            push @ret, N("package %s is intended for a different operating system", $p->{pkg});
             next;
         };
         $p->{pb} eq "PKG_INSTALLED" and do {
-            push @ret, N('package %s is allready installed', $p->{pkg});
+            push @ret, N("package %s is allready installed", $p->{pkg});
             next;
         };
         $p->{pb} eq "BADRELOCATE" and do {
-            push @ret, N('path %s in package %s is not relocatable', $p->{path}, $p->{pkg});
+            push @ret, N("path %s in package %s is not relocatable", $p->{path}, $p->{pkg});
             next;
         };
         $p->{pb} eq "NEW_FILE_CONFLICT" and do {
-            push @ret, N('file %s conflicts between attempted installs of %s and %s', $p->{file}, $p->{pkg}, $p->{pkg2});
+            push @ret, N("file %s conflicts between attempted installs of %s and %s", $p->{file}, $p->{pkg}, $p->{pkg2});
             next;
         };
         $p->{pb} eq "FILE_CONFLICT" and do {
-            push @ret, N('file %s from install of %s conflicts with file from package %s', $p->{file}, $p->{pkg}, $p->{pkg2});
+            push @ret, N("file %s from install of %s conflicts with file from package %s", $p->{file}, $p->{pkg}, $p->{pkg2});
             next;
         };
         $p->{pb} eq "OLDPACKAGE" and do {
-            push @ret, N('package %s (which is newer than %s) is already installed', $p->{pkg2}, $p->{pkg});
+            push @ret, N("package %s (which is newer than %s) is already installed", $p->{pkg2}, $p->{pkg});
             next;
         };
         $p->{pb} eq "DISKSPACE" and do {
-            push @ret, N('installing package %s needs %sB on the %s filesystem', $p->{pkg},
+            push @ret, N("installing package %s needs %sB on the %s filesystem", $p->{pkg},
                 ($p->{size} > 1024 * 1024
                     ? ($p->{size} + 1024 * 1024 - 1) / (1024 * 1024)
-                    : ($p->{size} + 1023) / 1024 ) . 
+                    : ($p->{size} + 1023) / 1024) . 
                 ($p->{size} > 1024 * 1024 ? 'M' : 'K'),
                 $p->{filesystem});
             next;
         };
         $p->{pb} eq "DISKNODES" and do {
-            push @ret, N('installing package %s needs %ld inodes on the %s filesystem', $p->{pkg}, $p->{nodes}, $p->{filesystem});
+            push @ret, N("installing package %s needs %ld inodes on the %s filesystem", $p->{pkg}, $p->{nodes}, $p->{filesystem});
             next;
         };
         $p->{pb} eq "BADPRETRANS" and do {
-            push @ret, N('package %s pre-transaction syscall(s): %s failed: %s', $p->{pkg}, $p->{'syscall'}, $p->{error});
+            push @ret, N("package %s pre-transaction syscall(s): %s failed: %s", $p->{pkg}, $p->{syscall}, $p->{error});
             next;
         };
         $p->{pb} eq "REQUIRES" and do {
-            push @ret, N('%s is needed by %s%s', $p->{pkg2},
+            push @ret, N("%s is needed by %s%s", $p->{pkg2},
                 defined($p->{installed}) ? N("(installed) ") : "",
                 $p->{pkg});
             next;
         };
         $p->{pb} eq "CONFLICT" and do {
-            push @ret, N('%s conflicts with %s%s', $p->{pkg2},
+            push @ret, N("%s conflicts with %s%s", $p->{pkg2},
                 defined($p->{val2}) ? N("(installed) ") : "",
                 $p->{pkg});
             next;
         };
-    };
-    @ret
+    }
+    @ret;
 }
 
 ##########################

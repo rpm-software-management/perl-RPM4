@@ -7,7 +7,7 @@ use FindBin qw($Bin);
 use RPM4;
 use RPM4::Header::Dependencies;
 
-my %minfo = RPM4::moduleinfo;
+my %_minfo = RPM4::moduleinfo;
 
 isa_ok(
     RPM4::rpmlibdep(),
@@ -41,7 +41,7 @@ isa_ok(
     '$hdep->dep("PROVIDENAME")'
 );
 ok(
-    ! defined $hdep->dep("TRIGGERNAME"),
+    ! defined($hdep->dep("TRIGGERNAME")),
     "fetching triggers returns undef"
 );
 
@@ -65,27 +65,27 @@ ok(! $htest->is_better_than($hdep), "test-rpm better than test-dep: no");
 my ($dep1, $dep2, $dep3);
 isa_ok(
     RPM4::Header::Dependencies->new("REQUIRENAME",
-        [ "test-rpm", [ qw/LESS EQUAL/ ], "1.0-1mdk" ]
+        [ "test-rpm", [ qw(LESS EQUAL) ], "1.0-1mdk" ]
     ),
     'RPM4::Header::Dependencies',
     'New REQUIRENAME dependencies'
 );
 
-ok($dep1 = RPM4::newdep("REQUIRENAME", "test-rpm", [ qw/LESS EQUAL/ ], "1.0-1mdk"), "Build a new dep");
-ok($dep2 = RPM4::newdep("REQUIRENAME", "test-rpm", [ qw/GREATER EQUAL/ ], "1.0-1mdk"), "Build a new dep");
+ok($dep1 = RPM4::newdep("REQUIRENAME", "test-rpm", [ qw(LESS EQUAL) ], "1.0-1mdk"), "Build a new dep");
+ok($dep2 = RPM4::newdep("REQUIRENAME", "test-rpm", [ qw(GREATER EQUAL) ], "1.0-1mdk"), "Build a new dep");
 ok($dep3 = RPM4::newdep("REQUIRENAME", "test-rpm", [ "GREATER" ], "1.0-1mdk"), "Build a new dep");
 
-is($dep1->count(), 1, "dependencies number");
-ok(defined($dep1->move()), "Can move into dep");
-ok($dep1->next() == -1, "no further dependency");
+is($dep1->count, 1, "dependencies number");
+ok(defined($dep1->move), "Can move into dep");
+ok($dep1->next == -1, "no further dependency");
 
-ok($dep1->add("test-dep", [ qw/LESS EQUAL/ ], "1.0-1mdk"), "Add a dep entry into existing dep");
+ok($dep1->add("test-dep", [ qw(LESS EQUAL) ], "1.0-1mdk"), "Add a dep entry into existing dep");
 
-ok(scalar($dep1->info()) eq "R test-rpm <= 1.0-1mdk", "Can get info from RPM4::Header::Dep");
-ok(($dep1->info())[3] eq "1.0-1mdk", "Can get info from RPM4::Header::Dep");
-ok($dep1->name() eq 'test-rpm', "Get dep name from RPM4::Header::Dep");
-ok($dep1->flags(), "Get dep flags from RPM4::Header::Dep");
-ok($dep1->evr() eq '1.0-1mdk', "Get dep evr from RPM4::Header::Dep");
+ok(scalar($dep1->info) eq "R test-rpm <= 1.0-1mdk", "Can get info from RPM4::Header::Dep");
+ok(($dep1->info)[3] eq "1.0-1mdk", "Can get info from RPM4::Header::Dep");
+ok($dep1->name eq 'test-rpm', "Get dep name from RPM4::Header::Dep");
+ok($dep1->flags, "Get dep flags from RPM4::Header::Dep");
+ok($dep1->evr eq '1.0-1mdk', "Get dep evr from RPM4::Header::Dep");
 
 ok($dep1->overlap($dep2), "compare two dep");
 ok($dep1->overlap($dep3) == 0, "compare two dep");

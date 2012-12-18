@@ -9,7 +9,7 @@ use RPM4;
 ok(! defined(RPM4::setverbosity("DEBUG")), "Set verbosity works");
 {
 my $marker =  0;
-ok(! defined(RPM4::setlogcallback(sub { my %m = @_; $marker = 1; print "$m{priority}: $m{msg}\n" } )),
+ok(!defined(RPM4::setlogcallback(sub { my %m = @_; $marker = 1; print "$m{priority}: $m{msg}\n" })),
     "Setting log callback function works");
 ok(!defined(RPM4::rpmlog("ERR", "This is a rpm debug message")), "rpmlog function works");
 ok($marker == 1, "rpmlogcallback has been called");
@@ -31,9 +31,9 @@ ok(length(RPM4::buildhost), "Return buildhost");
 
 # Playing with macros
 my $target_cpu = RPM4::expand("%_target_cpu");
-ok(($target_cpu !~ /^\%/), "Getting _target_cpu macro");
+ok($target_cpu !~ /^\%/, "Getting _target_cpu macro");
 # setting test_macro to test
-ok(RPM4::expand("%test_macro") eq "%test_macro", "\%test_macro is no set");
+ok(RPM4::expand("%test_macro") eq "%test_macro", '%test_macro is no set');
 RPM4::add_macro("test_macro test");
 ok(RPM4::expand("%test_macro") eq "test", "add_macro works");
 RPM4::del_macro("test_macro");

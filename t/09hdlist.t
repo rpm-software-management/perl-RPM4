@@ -7,15 +7,15 @@ use FindBin qw($Bin);
 use File::Temp qw(tempdir);
 use File::Glob;
 
-my $testdir = tempdir( CLEANUP => 1 );
+my $testdir = tempdir(CLEANUP => 1);
 
 use_ok('RPM4');
 use_ok('RPM4::Index');
 
 my @headers;
-my $callback = sub { my %arg = @_; defined($arg{header}) and push(@headers, $arg{header}); };
+my $callback = sub { my %arg = @_; defined($arg{header}) and push(@headers, $arg{header}) };
 
-my @rpms = <$Bin/*.rpm>;
+my @rpms = glob("$Bin/*.rpm");
 
 RPM4::parserpms(callback => $callback, rpms => [ @rpms ]);
 ok(scalar(@headers) == 4, "RPM4::parserpms works");

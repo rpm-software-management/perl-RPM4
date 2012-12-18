@@ -10,11 +10,11 @@ use RPM4;
 
 my $passphrase = "RPM4";
 
-my $testdir = tempdir( CLEANUP => 1 );
+my $testdir = tempdir(CLEANUP => 1);
 
 RPM4::add_macro("_dbpath $testdir");
 
-copy("$Bin/test-rpm-1.0-1mdk.noarch.rpm", "$testdir");
+copy("$Bin/test-rpm-1.0-1mdk.noarch.rpm", $testdir);
 
 RPM4::add_macro("_signature gpg");
 RPM4::add_macro("_gpg_name RPM4 test key");
