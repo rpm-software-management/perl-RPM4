@@ -71,7 +71,7 @@ ok($ts->transcheck == 0, "Checking transaction works");
 ok($ts->transorder == 0, "Run transaction order");
 
 ok(defined($ts->transflag([qw(JUSTDB)])), "Set transflags");
-ok($ts->transrun(sub { my %a = @_; print STDERR "$a{what} $a{filename} $a{amount} / $a{total}\n" }) == 0, "Running transaction justdb");
+ok($ts->transrun(sub { my %a = @_; print STDERR "$a{what} $a{amount} / $a{total}\n" }) == 0, "Running transaction justdb");
 
 #ok($ts->injectheader($hd) == 0, "Injecting header in a db");
 
