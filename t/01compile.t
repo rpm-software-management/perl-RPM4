@@ -1,3 +1,4 @@
+#!/usr/bin/perl
 # $Id$
 
 use Test::More tests => 3;
