@@ -1,6 +1,7 @@
 - drop support for repackage (not working anymore since rpm-4.6)
 - fix parsing new rpm headers
 - fix retrieving rpm version with beta versions
+- fix segfaulting with rpm-4.11 retrieving RPMLOG_*
 - fix srcrpm()
 - fix --rpmversion (broken for 6+ years...)
 
