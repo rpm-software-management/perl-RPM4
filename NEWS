@@ -1,4 +1,5 @@
 - drop support for repackage (not working anymore since rpm-4.6)
+- fix retrieving rpm version with beta versions
 - fix srcrpm()
 - fix --rpmversion (broken for 6+ years...)
 
