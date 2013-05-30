@@ -1,3 +1,7 @@
+Version 0.33 - 29 May 2013
+
+- fix build (fix detecting stable rpm)
+
 Version 0.32 - 17 December 2012
 
 - drop support for repackage (not working anymore since rpm-4.6)
