@@ -4,7 +4,7 @@
 use ExtUtils::MakeMaker;
 use Getopt::Long;
 
-#- require at least rpm 4.2
+#- require at least rpm 4.8
 my $rpm_version = `rpm --version` =~ /version ([0-9.]+)(?:-beta.*)?$/ ? version->new("v$1") : ();
 $rpm_version ge 4.8.0
     or die <<BARF;
