@@ -1453,34 +1453,6 @@ Ts_transflag(ts, sv_transflag = NULL)
     RETVAL
     
 int
-Ts_injectheader(db, header)
-    rpmts db
-    Header header
-    PREINIT:
-    CODE:
-    croak("injectheader>rpmdbAdd exists only in rpm < 4.9; unused anyway");
-    OUTPUT:
-    RETVAL
-
-int
-Ts_deleteheader(db, sv_offset)
-    rpmts db
-    SV * sv_offset
-    PREINIT:
-    rpmdb rdb;
-    unsigned int offset = 0;
-    CODE:
-    offset = SvUV(sv_offset);
-    rdb = rpmtsGetRdb(db);
-    if (offset) {
-        croak("deleteheader exists only in rpm < 4.9; unused anyway");
-        RETVAL = 0;
-   } else
-        RETVAL = 1;
-    OUTPUT:
-    RETVAL
-
-int
 Ts_traverse(ts, callback = NULL, sv_tagname = NULL, sv_tagvalue = NULL, keylen = 0, sv_exclude = NULL)
     rpmts ts
     SV * callback
@@ -2660,14 +2632,6 @@ Spec_build(spec, sv_buildflags)
     OUTPUT:
     RETVAL
 
-const char *
-Spec_specfile(spec)
-    rpmSpec spec
-    CODE:
-    croak("specfile exists only in rpm < 4.9; unused anyway");
-    OUTPUT:
-    RETVAL
-        
 void
 Spec_sources(spec, is = 0)
     rpmSpec spec
@@ -2695,20 +2659,6 @@ Spec_sources_url(spec, is = 0)
             continue;
         mXPUSHs(newSVpv(rpmSpecSrcFilename(srcPtr, 1), 0));
     }
-
-void
-Spec_icon(spec)
-    rpmSpec spec
-    PREINIT:
-    PPCODE:
-    croak("icon exists only in rpm < 4.9; unused anyway");
-
-void
-Spec_icon_url(spec)
-    rpmSpec spec
-    PREINIT:
-    PPCODE:
-    croak("icon_url exists only in rpm < 4.9; unused anyway; unused anyway");
 
 MODULE = RPM4		PACKAGE = RPM4::Db::_Problems	PREFIX = ps_
 
