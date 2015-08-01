@@ -1,4 +1,5 @@
 - drop support for rpm > 4.9.0
+- fix compiling with rpm-4.13
 
 Version 0.34 - 15 September 2014
 
