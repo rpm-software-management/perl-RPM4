@@ -31,8 +31,6 @@ print $FH ' * $Id$' . "\n";
 print $FH " */\n\n";
 print $FH "#ifndef RPMVERSION_H\n#define RPMVERSION_H\n\n";
 foreach (qw(
-    4.8.0
-    4.8.1
     4.9.0
     4.9.1
     4.9.1.1
