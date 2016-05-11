@@ -1,4 +1,6 @@
 - fix running rpm_produced
+- testsuite:
+  o disable tests that involve a pasphrase
 
 Version 0.36 - 26 October 2016
 
