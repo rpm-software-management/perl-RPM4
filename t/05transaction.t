@@ -73,8 +73,6 @@ ok($ts->transorder == 0, "Run transaction order");
 ok(defined($ts->transflag([qw(JUSTDB)])), "Set transflags");
 ok($ts->transrun(sub { my %a = @_; print STDERR "$a{what} $a{amount} / $a{total}\n" }) == 0, "Running transaction justdb");
 
-#ok($ts->injectheader($hd) == 0, "Injecting header in a db");
-
 my $found = 0;
 my $roffset;
 ok($ts->traverse(sub {
@@ -87,7 +85,6 @@ ok($ts->traverse(sub {
     }), "Running traverse");
 
 #ok($found, "Can find header in db");
-#ok($ts->deleteheader($roffset) == 0, "Removing header from db");
 
 $ts = undef; # explicitely calling DESTROY to close database
 
