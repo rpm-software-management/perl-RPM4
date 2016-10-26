@@ -1405,8 +1405,7 @@ Ts_new(perlclass, rootdir = NULL)
     PREINIT:
     rpmts ts = rpmtsCreate();
     PPCODE:
-    if (rootdir)
-        rpmtsSetRootDir(ts, rootdir);
+    rpmtsSetRootDir(ts, rootdir);
     mXPUSHs(sv_setref_pv(newSVpvs(""), perlclass, (void *)ts));
  
 void
