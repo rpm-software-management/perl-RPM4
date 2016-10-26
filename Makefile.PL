@@ -4,9 +4,9 @@
 use ExtUtils::MakeMaker;
 use Getopt::Long;
 
-#- require at least rpm 4.8
+#- require at least rpm 4.9
 my $rpm_version = `LC_ALL=C rpm --version` =~ /version ([0-9.]+)(?:-(?:beta|rc).*)?$/ ? version->new("v$1") : ();
-$rpm_version ge 4.8.0
+$rpm_version ge 4.9.0
     or die <<BARF;
 Unable to build RPM4 with too old (or undetected) rpm version $rpm_version
 BARF
