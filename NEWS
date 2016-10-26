@@ -1,4 +1,5 @@
 - fix segfault in testsuite
+- reenable some tests
 
 Version 0.35 - 1 August 2015
 
