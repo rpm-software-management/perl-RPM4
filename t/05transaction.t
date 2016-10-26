@@ -24,8 +24,8 @@ ok(RPM4::rpmdbrebuild == 0, "rebuild database");
 ok(RPM4::rpmdbverify == 0, "Verify empty");
 
 my $ts;
-ok($ts = RPM4::Transaction->new, "Open a new database");
-ok($ts->traverse(sub { print STDERR $_[0]->tag(1000) . "\n" }) != -1, "db->traverse");
+ok($ts = RPM4::Transaction->new, "Open a new transaction");
+ok($ts->traverse(sub { print STDERR $_[0]->tag(1000) . "\n" }) != -1, "ts->traverse");
 
 ok($ts->importpubkey("$Bin/gnupg/test-key.gpg") == 0, "Importing a public key");
 
