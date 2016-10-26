@@ -2,7 +2,7 @@
 # $Id$
 
 use strict;
-use Test::More tests => 42;
+use Test::More tests => 43;
 use FindBin qw($Bin);
 use File::Path;
 use File::Temp qw(tempdir);
@@ -77,14 +77,14 @@ my $found = 0;
 my $roffset;
 ok($ts->traverse(sub {
         my ($hf, $offset) = @_;
-        scalar($hf->fullname) eq "test-dep-1.0-1mdk.noarch" and do {
+        scalar($hf->fullname) eq "test-rpm-1.0-1mdk.noarch" and do {
             $found++;
             (undef, $roffset) = ($hf, $offset);
         };
         1;
     }), "Running traverse");
 
-#ok($found, "Can find header in db");
+ok($found, "Can find header in db");
 
 $ts = undef; # explicitely calling DESTROY to close database
 
