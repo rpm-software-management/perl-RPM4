@@ -1,3 +1,5 @@
+Version 0.36 - 26 October 2016
+
 - fix segfault in testsuite
 - reenable some tests
 
