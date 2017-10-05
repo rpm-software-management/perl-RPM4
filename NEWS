@@ -1,6 +1,7 @@
 - fix running rpm_produced
 - improve doc
 - fix a segfault
+- fix rpm-4.14 regressions
 - testsuite:
   o disable tests that involve a pasphrase
 
