@@ -1818,6 +1818,7 @@ Ts_transreset(ts)
     rpmts ts
     PPCODE:
     rpmtsEmpty(ts);
+    rpmtsSetRootDir(ts, "/");
 
 # Remaping function:
 
