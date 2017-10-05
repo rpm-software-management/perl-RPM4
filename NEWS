@@ -1,4 +1,5 @@
 - fix running rpm_produced
+- improve doc
 - testsuite:
   o disable tests that involve a pasphrase
 
