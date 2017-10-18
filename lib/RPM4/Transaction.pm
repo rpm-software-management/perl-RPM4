@@ -46,7 +46,7 @@ RPM4::Transaction
 
 =head1 DESCRIPTION
 
-This object allow to access to the rpm datadase and installing rpms on the
+This object allow to access to the rpm transaction packages and installing rpms on the
 system.
 
 =head1 METHODS
