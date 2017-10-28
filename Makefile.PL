@@ -33,6 +33,10 @@ WriteMakefile(
     'EXE_FILES'  => [ qw(bin/rpm_produced bin/rpmresign bin/hrpmreb) ],
     depend => { dist => 'copyrpmconstant' },
     LICENSE      => 'gpl_2',
+    META_MERGE => {
+	'meta-spec' => { version => 2 },
+	release_status => 'stable'
+    },
     PREREQ_PM => {
         Carp => 0,
         'Digest::SHA1' => 0,
