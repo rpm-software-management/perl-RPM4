@@ -37,6 +37,7 @@ WriteMakefile(
 	'meta-spec' => { version => 2 },
 	release_status => 'stable'
     },
+    MIN_PERL_VERSION => '5.008001',
     PREREQ_PM => {
         Carp => 0,
         'Digest::SHA1' => 0,
