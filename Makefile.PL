@@ -32,6 +32,7 @@ WriteMakefile(
     DIR          => [ 'src' ],
     'EXE_FILES'  => [ qw(bin/rpm_produced bin/rpmresign bin/hrpmreb) ],
     depend => { dist => 'copyrpmconstant' },
+    LICENSE      => 'gpl_2',
     PREREQ_PM => {
         Carp => 0,
         'Digest::SHA1' => 0,
