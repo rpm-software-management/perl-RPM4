@@ -4,6 +4,11 @@
 use ExtUtils::MakeMaker;
 use Getopt::Long;
 
+our %CONFIGURE_REQUIRES => (
+	'ExtUtils::MakeMaker' => '6.64',
+	'Getopt::Long' => '0',
+);
+
 #- require at least rpm 4.9
 my $rpm_version = `LC_ALL=C rpm --version` =~ /version ([0-9.]+)(?:-(?:beta|rc).*)?$/ ? version->new("v$1") : ();
 $rpm_version ge 4.9.0
@@ -38,10 +43,7 @@ WriteMakefile(
 	release_status => 'stable'
     },
     MIN_PERL_VERSION => '5.008001',
-    CONFIGURE_REQUIRES => {
-	'ExtUtils::MakeMaker' => '6.64',
-	'Getopt::Long' => '0',
-    },
+    CONFIGURE_REQUIRES => \%CONFIGURE_REQUIRES,
     PREREQ_PM => {
         Carp => 0,
         'Digest::SHA1' => 0,
