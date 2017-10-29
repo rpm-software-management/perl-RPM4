@@ -1,3 +1,6 @@
+- cpan testers:
+  o list dependancies
+
 Version 0.37 - 27 October 2017
 
 - fix running rpm_produced

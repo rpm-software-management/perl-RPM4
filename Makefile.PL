@@ -38,6 +38,10 @@ WriteMakefile(
 	release_status => 'stable'
     },
     MIN_PERL_VERSION => '5.008001',
+    CONFIGURE_REQUIRES => {
+	'ExtUtils::MakeMaker' => '6.64',
+	'Getopt::Long' => '0',
+    },
     PREREQ_PM => {
         Carp => 0,
         'Digest::SHA1' => 0,
