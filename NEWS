@@ -1,5 +1,6 @@
 - cpan testers:
   o list dependancies
+  o use PkgConfig in order to find rpm
 
 Version 0.37 - 27 October 2017
 

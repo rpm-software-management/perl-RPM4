@@ -2,19 +2,40 @@
 
 # use 5.008;
 use ExtUtils::MakeMaker;
+use ExtUtils::PkgConfig;
 use Getopt::Long;
 
-our %CONFIGURE_REQUIRES => (
+# minimum required version of dependencies we need to build
+our %build_reqs = (
+	'rpm' => '4.9.0',
+);
+our %CONFIGURE_REQUIRES = (
 	'ExtUtils::MakeMaker' => '6.64',
+	'ExtUtils::Depends' => '0',
+	'ExtUtils::PkgConfig' => '0',
 	'Getopt::Long' => '0',
 );
 
-#- require at least rpm 4.9
-my $rpm_version = `LC_ALL=C rpm --version` =~ /version ([0-9.]+)(?:-(?:beta|rc).*)?$/ ? version->new("v$1") : ();
-$rpm_version ge 4.9.0
-    or die <<BARF;
-Unable to build RPM4 with too old (or undetected) rpm version $rpm_version
-BARF
+# Writing a fake Makefile ensures that CPAN will pick up the correct
+# dependencies and install them.
+unless (eval "use ExtUtils::Depends '$CONFIGURE_REQUIRES{'ExtUtils::Depends'}';"
+           . "use ExtUtils::PkgConfig '$CONFIGURE_REQUIRES{'ExtUtils::PkgConfig'}';"
+           . "1") {
+   warn "$@\n";
+   WriteMakefile(
+         NAME         => 'URPM',
+         PREREQ_FATAL => 1,
+         PREREQ_PM    => \%CONFIGURE_REQUIRES,
+   );
+   exit 1; # not reached
+}
+
+my %cfg;
+unless (eval { %cfg = ExtUtils::PkgConfig->find("rpm >= $build_reqs{rpm}"); 1 })
+{
+	warn $@;
+	exit 0;
+}
 
 sub MY::postamble() {
     <<MAKECHANGELOG;
