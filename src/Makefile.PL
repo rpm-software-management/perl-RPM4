@@ -83,12 +83,14 @@ RPMCONSTTBL
 	$first . $second;
 }
 
+my $v = $rpmv;
+$v =~ s/\./_/g;
 WriteMakefile(
     NAME         => 'RPM4',
     VERSION_FROM => '../lib/RPM4.pm',
     OBJECT       => "RPM4.o $obj",
     INC	         => "-I$rpmheaderlocation",
     LIBS         => [ $cfg{libs} . " -lrpmsign -lrpmbuild $ldd" ],
-    CCFLAGS      => "$cfg{cflags} -Wall $fl",
+    CCFLAGS      => "$cfg{cflags} -Wall $fl -DRPM$v",
     depend       => { "RPM4.xs" => join(" ", @rpmconstantfiles) },
 );
