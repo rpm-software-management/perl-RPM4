@@ -1822,7 +1822,7 @@ Ts_transreset(ts)
 
 # Remaping function:
 
-# RPM4::rpm2header(filename); # Reusing existing RPM4::Db
+# RPM4::rpm2header(filename); # Reusing existing RPM4::Transaction
 void
 Ts_rpm2header(ts, filename)
     rpmts ts
@@ -1831,7 +1831,7 @@ Ts_rpm2header(ts, filename)
     _rpm2header(ts, filename, 0);
     SPAGAIN;
 
-# RPM4::Spec::specbuild([ buildflags ]); Reusing existing RPM4::Db
+# RPM4::Spec::specbuild([ buildflags ]); Reusing existing RPM4::Transaction
 int
 Ts_specbuild(ts, spec, sv_buildflags)
     rpmts ts
