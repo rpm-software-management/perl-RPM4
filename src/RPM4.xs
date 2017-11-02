@@ -471,7 +471,7 @@ int _headername_vs_dep(Header h, rpmds dep, int nopromote) {
 
 /* Hight level function */
 int rpmsign(char *passphrase, const char *rpm) {
-#ifdef RPM4_12_90
+#if defined(RPM4_12_90) | defined(PATCHED_rpmPkgSign)
     return rpmPkgSign(rpm, NULL);
 #else
     return rpmPkgSign(rpm, NULL, passphrase);

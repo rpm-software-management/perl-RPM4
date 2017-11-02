@@ -1,5 +1,6 @@
 - cpan testers:
   o detect rpm-4.1[0-2] which had another rpmPkgSign API
+  o detect patched rpm-4.12 in Mageia 5, various Debian & FC
   o list dependancies
   o skip a test with rpm-4.1[12] due to a segfault
   o use PkgConfig in order to find rpm

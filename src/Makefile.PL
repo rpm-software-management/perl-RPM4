@@ -50,6 +50,11 @@ foreach (qw(
     print $FH "#define RPM$v\n";
     $rpmv =~ /^\Q$_/ and last;
 }
+# Special case for patched rpm-4.12 in Mageia 5 & Fedora, 4.11 & 4.12 in Debian:
+sub cat_ { my @l = map { my $F; open($F, '<', $_) ? <$F> : () } @_; wantarray() ? @l : join '', @l }
+if (grep { /int rpmPkgSign.*rpmSignArgs/ } cat_("$rpmheaderlocation/rpmsign.h")) {
+    print $FH "#define PATCHED_rpmPkgSign\n";
+}
 print $FH "\n#endif\n";
 close($FH);
 exit 0 if $rebh;
