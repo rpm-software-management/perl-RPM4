@@ -4,6 +4,7 @@
 use ExtUtils::MakeMaker;
 use ExtUtils::PkgConfig;
 use Getopt::Long;
+use strict;
 
 # minimum required version of dependencies we need to build
 our %build_reqs = (
