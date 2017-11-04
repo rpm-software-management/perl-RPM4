@@ -421,7 +421,7 @@ void _newspec(rpmts ts, char * filename, SV * svanyarch, SV * svforce) {
 }
 
 /* Building a spec file */
-int _specbuild(rpmts ts, rpmSpec spec, SV * sv_buildflags) {
+int _specbuild(rpmSpec spec, SV * sv_buildflags) {
     rpmBuildFlags buildflags = sv2rpmbuildflags(sv_buildflags);
     if (buildflags == RPMBUILD_NONE) croak("No action given for build");
     BTA_t flags = calloc(1, sizeof(*flags));
@@ -1838,7 +1838,7 @@ Ts_specbuild(ts, spec, sv_buildflags)
     rpmSpec spec
     SV * sv_buildflags
     CODE:
-    RETVAL = _specbuild(ts, spec, sv_buildflags);
+    RETVAL = _specbuild(spec, sv_buildflags);
     OUTPUT:
     RETVAL
 
@@ -2625,10 +2625,8 @@ Spec_build(spec, sv_buildflags)
     rpmSpec spec
     SV * sv_buildflags
     PREINIT:
-    rpmts ts = rpmtsCreate();
     CODE:
-    RETVAL = _specbuild(ts, spec, sv_buildflags);
-    ts = rpmtsFree(ts);
+    RETVAL = _specbuild(spec, sv_buildflags);
     OUTPUT:
     RETVAL
 
