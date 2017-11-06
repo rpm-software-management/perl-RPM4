@@ -62,6 +62,13 @@ WriteMakefile(
     LICENSE      => 'gpl_2',
     META_MERGE => {
 	'meta-spec' => { version => 2 },
+        resources => {
+            repository  => {
+		type => 'git',
+		url => 'git://git.mageia.org/software/rpm/perl-RPM4/',
+		web =>  'http://gitweb.mageia.org/software/rpm/perl-RPM4/',
+	    },
+        },
 	release_status => 'stable'
     },
     MIN_PERL_VERSION => '5.008001',

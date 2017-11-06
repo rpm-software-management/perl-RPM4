@@ -4,6 +4,7 @@
   o list dependancies
   o skip a test with rpm-4.1[12] due to a segfault
   o use PkgConfig in order to find rpm
+- improve CPAN metadata
 
 Version 0.37 - 27 October 2017
 
