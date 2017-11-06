@@ -1,3 +1,5 @@
+Version 0.38 - 6 November 2017
+
 - cpan testers:
   o detect rpm-4.1[0-2] which had another rpmPkgSign API
   o detect patched rpm-4.12 in Mageia 5, various Debian & FC
