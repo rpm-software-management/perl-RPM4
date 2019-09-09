@@ -1,3 +1,5 @@
+- fix building with rpm-4.15
+
 Version 0.39 - 18 September 2018
 
 - cpan testers: skip some tests on *BSD & Debian
